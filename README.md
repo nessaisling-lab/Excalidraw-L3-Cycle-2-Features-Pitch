@@ -42,6 +42,7 @@ yarn start                   # opens on http://localhost:3001
 - **`yarn test:update` rewrites snapshots.** Only use it when you mean to.
 - **Never run `git clean -fd` in this repo.** `node_modules/@excalidraw/*` are symlinks back into `packages/`, and a recursive delete follows them and deletes real source.
 - **A few tests can time out on a busy machine**, for example while the dev server is starting. Rerun the failing file on its own before assuming it is broken.
+- **Don't click "Save to Excalidraw+" when running locally.** In dev it uploads the encrypted scene to Excalidraw's own Firebase dev project (`excalidraw-oss-dev`), not ours, then opens `localhost:3000/import`, which doesn't exist. Excalidraw+ is closed-source, so that page is not in this repo. Leave this path alone until the team adds a local stand-in.
 
 ---
 
