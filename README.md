@@ -1,25 +1,51 @@
 # Excalidraw L3 Cycle 2 — Features Pitch (Group G1)
 
-Pursuit L3, Cycle 2. Client: **Carlos Godoy, Head of Product**.
-KPI under discussion: activation rate — new signups who complete and save a
-first drawing within their first session.
+Pursuit L3, Cycle 2. Client: **Carlos Godoy, Head of Product**. KPI under discussion: activation rate — new signups who complete and save a first drawing within their first session.
 
-This is a prototype workspace, **not a fork** and not aimed at upstream PRs.
-`main` is the shared base, held at upstream `excalidraw/excalidraw@afa3a653`
-with full history (`git blame` and `git log -S` work). Nobody works on `main`.
+This is a prototype workspace, **not a fork** and not aimed at upstream PRs. `main` is the shared base, held at upstream `excalidraw/excalidraw@afa3a653` with full history (`git blame` and `git log -S` work). Nobody works on `main`.
 
 | Branch | Person | GitHub |
-|---|---|---|
+| --- | --- | --- |
 | `aisling` | Aisling Leiva-Davila (owner) | [@nessaisling-lab](https://github.com/nessaisling-lab) |
 | `cornell` | Cornell Robertson | [@CodeToTheCore](https://github.com/CodeToTheCore) |
 | `jill` | Jillian Krebsbach | [@JillK83](https://github.com/JillK83) |
 | `lawrence` | Lawrence Carrillo | [@lawrencecarrillo](https://github.com/lawrencecarrillo) |
 
-Work on your own branch; open PRs into `main` for team review.
+## Setup
+
+Needs Node 18 or newer (tested on Node 24) and Yarn 1.22.
+
+```bash
+git clone https://github.com/nessaisling-lab/Excalidraw-L3-Cycle-2-Features-Pitch.git
+cd Excalidraw-L3-Cycle-2-Features-Pitch
+git checkout <your-branch>   # aisling, cornell, jill or lawrence
+yarn install
+yarn start                   # opens on http://localhost:3001
+```
+
+| Command | What it does |
+| --- | --- |
+| `yarn start` | Dev server on port 3001 |
+| `yarn test:typecheck` | TypeScript check |
+| `yarn test:app --watch=false` | Run the test suite once, without touching snapshots |
+| `yarn fix` | Auto-format and lint. Run it before committing — there is no pre-commit hook |
+
+## Workflow
+
+- Work on your own branch. Nobody commits to `main` directly.
+- Pull in team changes with `git merge main`.
+- Open PRs into `main` for team review.
+
+## Gotchas
+
+- **Port is 3001, not 3000.** It is set in `.env.development`.
+- **`yarn test:update` rewrites snapshots.** Only use it when you mean to.
+- **Never run `git clean -fd` in this repo.** `node_modules/@excalidraw/*` are symlinks back into `packages/`, and a recursive delete follows them and deletes real source.
+- **A few tests can time out on a busy machine**, for example while the dev server is starting. Rerun the failing file on its own before assuming it is broken.
 
 ---
 
-*Upstream Excalidraw README follows.*
+_Upstream Excalidraw README follows._
 
 <a href="https://excalidraw.com/" target="_blank" rel="noopener">
   <picture>
