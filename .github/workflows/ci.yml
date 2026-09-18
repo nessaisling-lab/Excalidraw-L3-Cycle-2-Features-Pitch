@@ -1,0 +1,65 @@
+name: CI
+
+# Our own check, per the PRD's CI spec: typecheck, formatting, lint and unit
+# tests on every person-branch push and every PR into main. The inherited
+# upstream workflows only fire on `release`/`master`/`l10n_master` pushes or on
+# pull requests, so nothing ran on a person branch before this.
+#
+# Treated as a redundancy check: work is proven locally first, and this proves
+# it again on a clean runner across the Node versions we support. When the two
+# disagree, stop and find out why rather than trusting either one.
+
+on:
+  push:
+    branches:
+      - aisling
+      - cornell
+      - jill
+      - lawrence
+  pull_request:
+    branches:
+      - main
+
+# A new push supersedes the run it interrupted; no point paying for both.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      # Report both Node versions even when one fails — a version-specific
+      # failure is the thing this matrix exists to surface.
+      fail-fast: false
+      matrix:
+        node: ["20.x", "22.x"]
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+
+      - name: Install
+        run: yarn install --frozen-lockfile
+
+      - name: Typecheck
+        run: yarn test:typecheck
+
+      - name: Formatting
+        run: yarn test:other
+
+      - name: Lint
+        run: yarn test:code
+
+      - name: Unit tests
+        run: yarn test:app --watch=false
