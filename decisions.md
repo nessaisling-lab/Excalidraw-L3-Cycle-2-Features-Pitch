@@ -11,7 +11,7 @@ The PRD (`persistent-save-master-prd.md`) states final requirements only. This f
 ## Decisions
 
 | Date | Decision | Made by | Reasoning |
-| :--- | :--- | :--- | :--- |
+| :-- | :-- | :-- | :-- |
 | 2026-09-15 | C1 First-Save Moment approved as the primary build (over candidates A and C2) | Carlos, in client meeting | Directly addresses the confirmed save-guidance gap |
 | 2026-09-15 | All three surfaces (prompt, button, tooltips) approved as the final solution, staged | Carlos, in client meeting | Team had already proposed staging; Carlos signed off on the full set |
 | 2026-09-15 | Persistent save button built as always-visible from landing, not conditionally triggered | Team | Simpler mental model; permanent fallback independent of the prompt's one-time firing |
@@ -50,7 +50,7 @@ The PRD (`persistent-save-master-prd.md`) states final requirements only. This f
 ## Still open
 
 | Question | Owner | Needed by |
-| :--- | :--- | :--- |
+| :-- | :-- | :-- |
 | Carlos's mockup-approval turnaround time is not agreed. Weekend availability is unclear on both sides (team may work weekends; Carlos's weekend availability unconfirmed) | Jillian, to raise with Carlos | Before Stage 1 mockup goes out — a 5–10 day window across three approval gates has no slack for an undefined SLA |
 | Exact upper-right / lower-right coordinates for the C1 prompt | Aisling | Once Lyssna A/B read comes back |
 | Whether to remove the now-orphaned `plus_link_click` instrumentation event or leave it defined-but-dormant, since the Plus link no longer exists in the prompt | Team | Before Stage 1 instrumentation is finalized |
