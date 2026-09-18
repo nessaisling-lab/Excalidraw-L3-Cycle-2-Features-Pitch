@@ -61,5 +61,8 @@ jobs:
       - name: Lint
         run: yarn test:code
 
-      - name: Unit tests
-        run: yarn test:app --watch=false
+      # Runs the same suite as `test:app`, and additionally enforces the
+      # coverage thresholds in vitest.config.mts. Kept here so retiring the
+      # inherited test-coverage-pr workflow doesn't quietly drop that gate.
+      - name: Unit tests and coverage
+        run: yarn test:coverage --watch=false
