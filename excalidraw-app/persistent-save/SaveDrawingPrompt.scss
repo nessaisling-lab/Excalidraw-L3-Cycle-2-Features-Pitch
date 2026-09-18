@@ -1,0 +1,146 @@
+.excalidraw {
+  // The First-Save Moment prompt (C1).
+  //
+  // Absolutely positioned rather than placed in the top bar's flow: as a flow
+  // child it pushes the shape-properties panel down and, below ~1424px, widens
+  // the left grid column and squeezes the toolbar. Out of flow it costs the
+  // app's layout nothing at any width.
+  //
+  // Colours come from the app's own tokens rather than the hex values in the
+  // design spec. They carry the same values in the light theme, and unlike the
+  // hex they also work in the dark one.
+  .c1-save-prompt {
+    position: absolute;
+    z-index: var(--zIndex-ui-top);
+
+    // The app's standard gutter, so the card lines up with everything else.
+    inset-inline-end: 1rem;
+
+    width: 340px;
+    max-width: calc(100vw - 2rem);
+    box-sizing: border-box;
+    padding: 16px;
+
+    background: var(--island-bg-color);
+    border-radius: 8px;
+    box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.17), 0px 0px 3px rgba(0, 0, 0, 0.08),
+      0px 7px 14px rgba(0, 0, 0, 0.05);
+
+    font-family: var(--ui-font);
+
+    // Mobile is out of scope this cycle: nothing new renders below 768px.
+    @media (max-width: 767px) {
+      display: none;
+    }
+
+    &--upper-right {
+      // Clears the Excalidraw+ / Share / sidebar cluster, which ends at y 52.
+      top: 68px;
+    }
+
+    &--lower-right {
+      // Clears the help and encryption buttons along the bottom edge.
+      bottom: 68px;
+    }
+
+    &__headline {
+      margin: 0 24px 4px 0; // right margin keeps the text clear of the ✕
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary-color);
+    }
+
+    &__body {
+      margin: 0 0 12px;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+      // One step darker than the spec's --color-gray-60: that value is 4.29:1
+      // on white, just under the 4.5:1 WCAG AA needs for text this size.
+      color: var(--color-gray-70);
+    }
+
+    // The gray scale does not flip between themes, so a grey that passes on a
+    // white card is 2.34:1 on a dark one. Both muted colours are re-pointed
+    // rather than left to inherit.
+    @at-root .excalidraw.theme--dark#{&} {
+      .c1-save-prompt__body,
+      .c1-save-prompt__dismiss {
+        color: var(--color-gray-40);
+      }
+
+      .c1-save-prompt__dismiss:hover {
+        color: var(--color-gray-30);
+      }
+    }
+
+    &__save {
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      // Not plain white: in the dark theme --color-primary is a light lavender,
+      // and white on it is 2.21:1. --color-surface-lowest flips with the theme,
+      // which is what the app's own filled buttons use.
+      color: var(--color-surface-lowest);
+      background: var(--color-primary);
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 16px;
+      cursor: pointer;
+
+      // WCAG 2.5.8 asks for 44x44; the visible button is smaller than that, so
+      // the target is grown with a pseudo-element instead of padding the design
+      // out of shape.
+      position: relative;
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 50% 0 0 50%;
+        translate: -50% -50%;
+        width: 100%;
+        height: 44px;
+        min-width: 44px;
+      }
+
+      &:hover {
+        background: var(--color-primary-hover);
+      }
+
+      &:active {
+        background: var(--color-primary-darker);
+      }
+    }
+
+    &__dismiss {
+      position: absolute;
+      top: 12px;
+      inset-inline-end: 12px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 16px;
+      height: 16px;
+      padding: 0;
+
+      color: var(--color-gray-70);
+      background: none;
+      border: 0;
+      cursor: pointer;
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 50% 0 0 50%;
+        translate: -50% -50%;
+        width: 44px;
+        height: 44px;
+      }
+
+      &:hover {
+        color: var(--color-gray-80);
+      }
+    }
+  }
+}
