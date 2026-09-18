@@ -155,6 +155,12 @@ export default defineConfig(({ mode }) => {
       svgrPlugin(),
       ViteEjsPlugin(),
       VitePWA({
+        // The GitHub Pages demo build ships a self-destroying worker: it
+        // unregisters itself and clears its caches on load. Under a
+        // sub-path a stale worker keeps serving an old bundle, and that
+        // build is redeployed as each stage lands. The plugin still has to
+        // run either way — the app imports its virtual:pwa-register module.
+        selfDestroying: envVars.VITE_APP_DISABLE_PWA === "true",
         registerType: "autoUpdate",
         devOptions: {
           /* set this flag to true to enable in Development mode */
@@ -318,6 +324,14 @@ export default defineConfig(({ mode }) => {
       }),
       createHtmlPlugin({
         minify: true,
+        // The page template gates Excalidraw's Simple Analytics snippet on
+        // PROD, and this plugin is what supplies PROD from Vite's env. The
+        // Pages demo is a production build, so without this override it would
+        // report page views into Excalidraw's own analytics account. Every
+        // other build passes no data and is unchanged.
+        ...(envVars.VITE_APP_IS_DEMO === "true"
+          ? { inject: { data: { PROD: false } } }
+          : {}),
       }),
     ],
     publicDir: "../public",
