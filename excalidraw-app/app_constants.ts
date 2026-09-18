@@ -42,6 +42,7 @@ export const STORAGE_KEYS = {
   LOCAL_STORAGE_COLLAB: "excalidraw-collab",
   LOCAL_STORAGE_THEME: "excalidraw-theme",
   LOCAL_STORAGE_DEBUG: "excalidraw-debug",
+  LOCAL_STORAGE_C1: "excalidraw-c1",
   VERSION_DATA_STATE: "version-dataState",
   VERSION_FILES: "version-files",
 
