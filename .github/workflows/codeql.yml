@@ -1,0 +1,50 @@
+name: CodeQL
+
+# Static security analysis. Free on this repository because it is public.
+# Results land in the Security tab, and on a pull request CodeQL annotates the
+# diff with anything it finds in the changed code.
+#
+# The weekly run matters as much as the PR run: advisories and query packs are
+# updated after our code is written, so a file that was clean when it merged
+# can start reporting later without anyone touching it.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Mondays, early. Off-peak and before the week's work starts.
+    - cron: "17 3 * * 1"
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze JavaScript/TypeScript
+    runs-on: ubuntu-latest
+
+    permissions:
+      # required to upload results to the Security tab
+      security-events: write
+      contents: read
+      actions: read
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@faaca9a8f6edddba5725ffe5adefdab6669a2eca # v3
+        with:
+          languages: javascript-typescript
+          # Default query suite. `security-extended` exists and finds more, but
+          # it is noisier; worth revisiting once we have seen a clean baseline.
+
+      # No build step: CodeQL analyses JS/TS from source, so the monorepo does
+      # not need to compile for this to work.
+      - name: Analyze
+        uses: github/codeql-action/analyze@faaca9a8f6edddba5725ffe5adefdab6669a2eca # v3
