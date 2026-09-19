@@ -48,6 +48,7 @@ The PRD (`persistent-save-master-prd.md`) states final requirements only. This f
 | 2026-09-18 | Card height confirmed at exactly 141px rendered — matches the ~141px estimate exactly, no variance | Aisling, measured against the running app | Closes the "don't force it" caveat from the handoff; height remains auto/hug-contents in the component, this is just the resulting rendered value for this copy |
 | 2026-09-18 | Card visual spec should reference Excalidraw's own design tokens (`var(--ui-font)`, `var(--color-primary)`) rather than literal hex values, once real component work begins. Currently identical values (`Assistant, system-ui...` / `#6965db`), so no visual change today — but using tokens means theming and future brand changes propagate automatically | Aisling | Mockups intentionally kept literal hex so they match the approved export exactly; the real build should use tokens |
 | 2026-09-18 | Dark-theme values needed for the card — currently unspecified (white background, #1B1B1F headline, #7A7A7A body only). Required by the team's own ratified accessibility criteria (PRD §6a, 4.5:1 contrast in both themes). **Resolved: Aisling to derive dark-theme values from the app's existing surface tokens** rather than the team specifying new custom colors | Aisling flagged the gap; Jillian decided the resolution approach | Keeps the card visually consistent with Excalidraw's own dark theme rather than introducing one-off colors; avoids a second design pass later |
+
 ---
 
 ## Still open
