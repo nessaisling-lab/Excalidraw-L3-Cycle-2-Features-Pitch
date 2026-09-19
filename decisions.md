@@ -58,6 +58,10 @@ The PRD (`persistent-save-master-prd.md`) states final requirements only. This f
 | Which position wins — upper-right (x 1036, y 68) or lower-right (x 1036, y 691) — both are measured and built as real Lyssna stimuli; only the selection is pending | Lyssna read, then Carlos | Before Stage 1 component code is finalized against one position |
 | Whether to remove the now-orphaned `plus_link_click` instrumentation event or leave it defined-but-dormant, since the Plus link no longer exists in the prompt | Team | Before Stage 1 instrumentation is finalized |
 
+## Flagged, not yet re-confirmed
+
+- **Dwell time**: team finalized 15s; Carlos's original guidance was ~30s. Flagged explicitly at the 2026-09-16 and 2026-09-18 touchpoints — still not re-confirmed by him at the new value. Needs a direct answer, not just repeated flagging.
+
 ## Cross-reference
 
 Full requirements, instrumentation spec, accessibility criteria, and failure-state handling live in `persistent-save-master-prd.md`, §§2–9 and §13. This file is the historical/reasoning record; that one is the spec to build against.
