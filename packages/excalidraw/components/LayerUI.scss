@@ -30,6 +30,16 @@
       & > * {
         pointer-events: var(--ui-pointerEvents);
       }
+
+      .persistent-save-button {
+        white-space: nowrap;
+      }
+
+      @media (max-width: 767px) {
+        .persistent-save-button {
+          display: none;
+        }
+      }
     }
 
     &__footer {
