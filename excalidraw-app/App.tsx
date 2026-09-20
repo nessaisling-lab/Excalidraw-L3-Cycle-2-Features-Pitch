@@ -31,12 +31,10 @@ import {
   resolvablePromise,
   isRunningInIframe,
   isDevEnv,
-  MIME_TYPES,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
-import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import { t } from "@excalidraw/excalidraw/i18n";
 
 import {
@@ -145,6 +143,8 @@ import DebugCanvas, {
 import { useSimulatedCollaborators } from "./debugCollaborators";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { downloadScene } from "./persistent-save/downloadScene";
+import { PersistentSaveButton } from "./persistent-save/PersistentSaveButton";
 
 import "./index.scss";
 
@@ -372,25 +372,6 @@ const initializeScene = async (opts: {
       : { scene, isExternalScene: false };
   }
   return { scene: null, isExternalScene: false };
-};
-
-const downloadScene = (api: ExcalidrawImperativeAPI) => {
-  const serialized = serializeAsJSON(
-    api.getSceneElements(),
-    api.getAppState(),
-    api.getFiles(),
-    "local",
-  );
-  const url = URL.createObjectURL(
-    new Blob([serialized], { type: MIME_TYPES.excalidraw }),
-  );
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `${api.getName() || "Untitled"}.excalidraw`;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
 };
 
 const ExcalidrawWrapper = () => {
@@ -1020,21 +1001,15 @@ const ExcalidrawWrapper = () => {
 
           return (
             <div className="excalidraw-ui-top-right">
-              {!isExcalidrawPlusSignedUser && !appState.viewModeEnabled && (
-                <button
-                  type="button"
-                  className="excalidraw-button persistent-save-button"
-                  title="Save File (Ctrl/Cmd+S)"
-                  aria-label="Save File"
-                  onClick={() => {
-                    if (excalidrawAPI) {
-                      downloadScene(excalidrawAPI);
-                    }
-                  }}
-                >
-                  Save File
-                </button>
-              )}
+              <PersistentSaveButton
+                isPlusSignedUser={isExcalidrawPlusSignedUser}
+                viewModeEnabled={Boolean(appState.viewModeEnabled)}
+                onSave={() => {
+                  if (excalidrawAPI) {
+                    downloadScene(excalidrawAPI);
+                  }
+                }}
+              />
               {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
                 <ExcalidrawPlusPromoBanner
                   isSignedIn={isExcalidrawPlusSignedUser}
