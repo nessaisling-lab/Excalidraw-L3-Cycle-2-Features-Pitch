@@ -8,6 +8,7 @@ import React from "react";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 import { C1_ENABLED } from "./config";
+import { getDemoArm } from "./demoArm";
 import { SaveDrawingPrompt } from "./SaveDrawingPrompt";
 import { usePersistentSavePrompt } from "./usePersistentSavePrompt";
 
@@ -32,7 +33,9 @@ export const PersistentSavePrompt = ({
     appState,
   });
 
-  if (!C1_ENABLED || !visible) {
+  // `?arm=control` shows today's experience with nothing added, so the two can
+  // be compared in one session. Fixed to the treatment outside demo builds.
+  if (!C1_ENABLED || getDemoArm() === "control" || !visible) {
     return null;
   }
 

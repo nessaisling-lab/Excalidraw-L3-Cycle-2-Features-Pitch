@@ -10,6 +10,7 @@ import {
   subscribeToC1Changes,
 } from "../persistent-save/c1State";
 import { C1_DEFAULTS, resolveC1Config } from "../persistent-save/config";
+import { resolveDemoArm } from "../persistent-save/demoArm";
 import {
   createDwellTracker,
   hasQualifyingElement,
@@ -308,5 +309,46 @@ describe("C1 session record", () => {
     expect(onChange).not.toHaveBeenCalled();
 
     unsubscribe();
+  });
+});
+
+describe("demo A/B arm", () => {
+  it("shows the treatment by default — that is what the demo is for", () => {
+    expect(resolveDemoArm("", true, null).arm).toBe("nudge");
+  });
+
+  it("switches to today's experience on ?arm=control", () => {
+    const { arm, shouldStore } = resolveDemoArm("?arm=control", true, null);
+
+    expect(arm).toBe("control");
+    expect(shouldStore).toBe(true);
+  });
+
+  it("remembers the choice, so it survives a reload without the parameter", () => {
+    // Whoever is demoing shouldn't have to keep the parameter in the URL.
+    const { arm, shouldStore } = resolveDemoArm("", true, "control");
+
+    expect(arm).toBe("control");
+    expect(shouldStore).toBe(false);
+  });
+
+  it("lets the URL override what was remembered", () => {
+    expect(resolveDemoArm("?arm=nudge", true, "control").arm).toBe("nudge");
+  });
+
+  it("ignores an arm it does not recognise", () => {
+    expect(resolveDemoArm("?arm=sideways", true, null).arm).toBe("nudge");
+    expect(resolveDemoArm("?arm=sideways", true, "control").arm).toBe(
+      "control",
+    );
+  });
+
+  it("is fixed in a real production build", () => {
+    // The live experiment assigns the arm, never the address bar — and a
+    // stored value from some earlier build must not leak into it either.
+    expect(resolveDemoArm("?arm=control", false, "control")).toEqual({
+      arm: "nudge",
+      shouldStore: false,
+    });
   });
 });
