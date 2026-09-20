@@ -39,6 +39,21 @@
         --button-width: auto;
         --button-height: var(--lg-button-size);
 
+        // Take every colour from the Excalidraw+ banner beside it, so the two
+        // text buttons in this cluster are one style rather than two. See
+        // .plus-banner in excalidraw-app/index.scss — secondary fill at rest,
+        // primary fill on hover, darker primary on press.
+        --button-bg: var(--color-surface-low);
+        --button-border: var(--color-surface-low);
+        --button-color: var(--color-on-surface);
+
+        --button-hover-bg: var(--color-primary);
+        --button-hover-border: var(--color-primary);
+        --button-hover-color: var(--color-surface-lowest);
+
+        --button-active-bg: var(--color-primary-darker);
+        --button-active-border: var(--color-brand-active);
+
         white-space: nowrap;
       }
 
