@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- local measurement script: console output is the point */
 /**
  * Measures the Stage 2 persistent save button against the accessibility bar,
  * in both themes, on a real render.
@@ -10,7 +11,10 @@
  *   node docs/cycle-2/measure-stage2-button.js
  */
 const path = require("path");
-const GLOBAL = require("child_process").execSync("npm root -g").toString().trim();
+const GLOBAL = require("child_process")
+  .execSync("npm root -g")
+  .toString()
+  .trim();
 const { chromium } = require(path.join(GLOBAL, "playwright"));
 
 const URL = process.env.MEASURE_URL || "http://localhost:3000";
@@ -22,7 +26,9 @@ const luminance = (color) => {
     .match(/[\d.]+/g)
     .slice(0, 3)
     .map((v) => v / 255)
-    .map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+    .map((v) =>
+      v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4),
+    );
   return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
 };
 
@@ -95,7 +101,9 @@ const report = (theme, rest, hover, focus) => {
   if (!ring) {
     failures.push("no visible focus indicator");
   } else if (ringContrast < 3) {
-    failures.push(`focus ring contrast ${ringContrast.toFixed(2)}:1 is under 3:1`);
+    failures.push(
+      `focus ring contrast ${ringContrast.toFixed(2)}:1 is under 3:1`,
+    );
   }
 
   console.log(`\n${theme} theme`);
@@ -108,7 +116,9 @@ const report = (theme, rest, hover, focus) => {
   console.log(`  label contrast  ${textContrast.toFixed(2)}:1 (needs 4.5:1)`);
   console.log(`  hover change    ${rest.background} -> ${hover.background}`);
   console.log(
-    `  focus ring      ${ring ? `${ring[0]} at ${ringContrast.toFixed(2)}:1` : "none"}`,
+    `  focus ring      ${
+      ring ? `${ring[0]} at ${ringContrast.toFixed(2)}:1` : "none"
+    }`,
   );
   console.log(`  ${failures.length ? `FAIL: ${failures.join("; ")}` : "PASS"}`);
 
