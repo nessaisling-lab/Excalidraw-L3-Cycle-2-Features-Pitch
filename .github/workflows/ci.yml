@@ -10,12 +10,13 @@ name: CI
 # disagree, stop and find out why rather than trusting either one.
 
 on:
+  # Every branch, not a list of names. The original four person branches missed
+  # `stage2/persistent-save` and `chore/align-vitest-dependencies`, so two
+  # branches sat on the repo with no CI at all until someone opened a PR for
+  # them. A branch nobody remembered to name is exactly the one that needs it.
   push:
     branches:
-      - aisling
-      - cornell
-      - jill
-      - lawrence
+      - "**"
   pull_request:
     branches:
       - main
