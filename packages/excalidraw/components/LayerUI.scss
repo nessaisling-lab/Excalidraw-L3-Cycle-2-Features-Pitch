@@ -32,6 +32,13 @@
       }
 
       .persistent-save-button {
+        // .excalidraw-button is sized for an icon: a fixed --default-button-size
+        // box with 10px padding, which leaves a 10px content box. A text label
+        // needs to drive the width instead, and match the height of the rest of
+        // the cluster (Share does the same).
+        --button-width: auto;
+        --button-height: var(--lg-button-size);
+
         white-space: nowrap;
       }
 
