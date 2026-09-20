@@ -117,4 +117,18 @@ describe("prompt anchor config", () => {
       C1_DEFAULTS.anchor,
     );
   });
+
+  it("lets a build that allows overrides shorten the wait", () => {
+    // The demo build opts in, so the team and the client can see the prompt
+    // without sitting through 15 seconds for a once-ever surface.
+    const config = resolveC1Config("?dwell=1&quiet=0", true);
+
+    expect(config.dwellMs).toBe(1000);
+    expect(config.quietGateMs).toBe(0);
+  });
+
+  it("keeps a real production build on the agreed timing", () => {
+    // Everyone in an A/B arm has to get the same dwell or the result is noise.
+    expect(resolveC1Config("?dwell=1&quiet=0", false)).toEqual(C1_DEFAULTS);
+  });
 });

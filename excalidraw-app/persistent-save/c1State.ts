@@ -130,6 +130,22 @@ export const initC1Session = ({
   };
 };
 
+/**
+ * Forgets the record entirely, so the prompt is eligible again.
+ *
+ * Only ever called from a build that allows URL overrides — the prompt is
+ * once-ever per browser profile by design, and that is a client constraint,
+ * not an inconvenience to work around in production.
+ */
+export const clearC1Record = (): void => {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.LOCAL_STORAGE_C1);
+  } catch (error: any) {
+    // Unable to access localStorage
+    console.error(error);
+  }
+};
+
 /** No-ops if there is no record — nothing to advance. */
 export const markC1State = (state: C1State, now = Date.now()): boolean => {
   const existing = readC1Record();

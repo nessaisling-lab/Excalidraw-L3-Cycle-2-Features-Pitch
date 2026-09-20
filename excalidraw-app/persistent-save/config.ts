@@ -52,16 +52,19 @@ const readSeconds = (params: URLSearchParams, key: string): number | null => {
 };
 
 /**
- * `?dwell=3&quiet=0`, in seconds. Honoured in dev and QA builds only — in
- * production a URL must never be able to change what real visitors experience,
- * since the A/B result depends on everyone in an arm getting the same timing.
+ * `?dwell=3&quiet=0`, in seconds, plus `?pos=` for the anchor.
+ *
+ * Honoured where the build exists to be driven by hand — development, and the
+ * public demo the team and the client click through. Ignored in a real
+ * production build, where a URL must never change what visitors experience:
+ * the A/B result depends on everyone in an arm getting the same timing.
  */
 export const resolveC1Config = (
   search: string,
-  isDev: boolean,
+  allowOverrides: boolean,
   defaults: C1Config = C1_DEFAULTS,
 ): C1Config => {
-  if (!isDev) {
+  if (!allowOverrides) {
     return defaults;
   }
 
@@ -79,9 +82,19 @@ export const resolveC1Config = (
   };
 };
 
+/**
+ * Whether this build may be steered from the URL.
+ *
+ * True in development and in the demo build. Waiting 15 seconds for one
+ * once-ever prompt, with no way to see it again, makes the demo effectively
+ * untestable for the people who need to check it.
+ */
+export const ALLOW_TEST_OVERRIDES =
+  import.meta.env.DEV || import.meta.env.VITE_APP_IS_DEMO === "true";
+
 export const C1_CONFIG = resolveC1Config(
   typeof window === "undefined" ? "" : window.location.search,
-  import.meta.env.DEV,
+  ALLOW_TEST_OVERRIDES,
 );
 
 /**

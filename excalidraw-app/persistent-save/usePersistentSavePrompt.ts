@@ -7,12 +7,13 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { STORAGE_KEYS } from "../app_constants";
 
 import {
+  clearC1Record,
   initC1Session,
   isPromptSpent,
   markC1State,
   subscribeToC1Changes,
 } from "./c1State";
-import { C1_CONFIG } from "./config";
+import { ALLOW_TEST_OVERRIDES, C1_CONFIG } from "./config";
 import { createDwellTracker, hasQualifyingElement } from "./trigger";
 
 import type { C1Config } from "./config";
@@ -60,7 +61,24 @@ export const usePersistentSavePrompt = ({
 
   // One-time first-visit check.
   useEffect(() => {
-    const session = initC1Session({ hasSceneData: sceneDataExists() });
+    // `?reset` makes the prompt eligible again. Without it the demo is a
+    // one-shot per browser profile, which is fine for a real visitor and
+    // useless for anyone trying to check the thing works.
+    const didReset =
+      ALLOW_TEST_OVERRIDES &&
+      new URLSearchParams(window.location.search).has("reset");
+
+    if (didReset) {
+      clearC1Record();
+    }
+
+    // Dropping the record alone isn't enough: by the time anyone resets, the
+    // canvas they drew on has been autosaved, and scene-data-without-a-record
+    // is precisely how a returning visitor is identified. A reset means "treat
+    // me as new", so the scene check is skipped rather than worked around.
+    const session = initC1Session({
+      hasSceneData: didReset ? false : sceneDataExists(),
+    });
 
     // No prompt if we can't persist a dismissal — it would come back on every
     // load, which breaks Carlos's "one dismissal kills it permanently".

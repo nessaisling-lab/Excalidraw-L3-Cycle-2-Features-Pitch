@@ -2,6 +2,7 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import { STORAGE_KEYS } from "../app_constants";
 import {
+  clearC1Record,
   initC1Session,
   isPromptSpent,
   markC1State,
@@ -252,6 +253,19 @@ describe("C1 session record", () => {
 
   it("does nothing when there is no record to advance", () => {
     expect(markC1State("shown")).toBe(false);
+  });
+
+  it("can be forgotten, so the prompt becomes eligible again", () => {
+    initC1Session({ hasSceneData: false, now: 1000 });
+    markC1State("dismissed", 2000);
+    expect(isPromptSpent(readC1Record())).toBe(true);
+
+    clearC1Record();
+
+    expect(readC1Record()).toBeNull();
+    expect(
+      initC1Session({ hasSceneData: false, now: 3000 }).isFirstTimeVisitor,
+    ).toBe(true);
   });
 
   it("ignores a malformed record rather than throwing at startup", () => {
