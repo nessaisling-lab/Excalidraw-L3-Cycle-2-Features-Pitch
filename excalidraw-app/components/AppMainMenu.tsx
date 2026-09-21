@@ -2,6 +2,7 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  usersIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { MainMenu } from "@excalidraw/excalidraw/index";
@@ -13,6 +14,8 @@ import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
+
+import { DEMO_MENU_LABEL, IS_DEMO_BUILD } from "../demo/DemoBuild";
 
 import { saveDebugState } from "./DebugCanvas";
 
@@ -30,12 +33,25 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
-      {props.isCollabEnabled && (
-        <MainMenu.DefaultItems.LiveCollaborationTrigger
-          isCollaborating={props.isCollaborating}
-          onSelect={() => props.onCollabDialogOpen()}
-        />
-      )}
+      {props.isCollabEnabled &&
+        (IS_DEMO_BUILD ? (
+          // Kept in place rather than removed: someone evaluating the app
+          // should see that collaboration exists and was switched off for the
+          // demo, not find a menu with a hole in it. Inert, and says so.
+          <MainMenu.Item
+            icon={usersIcon}
+            onSelect={() => {}}
+            className="demo-menu-item--disabled"
+            aria-disabled="true"
+          >
+            {DEMO_MENU_LABEL}
+          </MainMenu.Item>
+        ) : (
+          <MainMenu.DefaultItems.LiveCollaborationTrigger
+            isCollaborating={props.isCollaborating}
+            onSelect={() => props.onCollabDialogOpen()}
+          />
+        ))}
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />

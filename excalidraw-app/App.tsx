@@ -143,6 +143,13 @@ import DebugCanvas, {
 import { useSimulatedCollaborators } from "./debugCollaborators";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { PersistentSavePrompt } from "./persistent-save/PersistentSavePrompt";
+import {
+  DemoBadge,
+  DemoShareButton,
+  IS_DEMO_BUILD,
+  useDemoTitle,
+} from "./demo/DemoBuild";
 
 import "./index.scss";
 
@@ -374,6 +381,8 @@ const initializeScene = async (opts: {
 
 const ExcalidrawWrapper = () => {
   const excalidrawAPI = useExcalidrawAPI();
+
+  useDemoTitle();
 
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
@@ -1006,13 +1015,17 @@ const ExcalidrawWrapper = () => {
               )}
 
               {collabError.message && <CollabError collabError={collabError} />}
-              <LiveCollaborationTrigger
-                isCollaborating={isCollaborating}
-                onSelect={() =>
-                  setShareDialogState({ isOpen: true, type: "share" })
-                }
-                editorInterface={editorInterface}
-              />
+              {IS_DEMO_BUILD ? (
+                <DemoShareButton editorInterface={editorInterface} />
+              ) : (
+                <LiveCollaborationTrigger
+                  isCollaborating={isCollaborating}
+                  onSelect={() =>
+                    setShareDialogState({ isOpen: true, type: "share" })
+                  }
+                  editorInterface={editorInterface}
+                />
+              )}
             </div>
           );
         }}
@@ -1060,6 +1073,10 @@ const ExcalidrawWrapper = () => {
         </OverwriteConfirmDialog>
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
+        {excalidrawAPI && !isCollaborating && (
+          <PersistentSavePrompt excalidrawAPI={excalidrawAPI} />
+        )}
+        <DemoBadge />
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (
