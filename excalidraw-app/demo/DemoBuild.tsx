@@ -1,5 +1,9 @@
 import { LiveCollaborationTrigger } from "@excalidraw/excalidraw";
+import { Card } from "@excalidraw/excalidraw/components/Card";
+import { IconButton } from "@excalidraw/excalidraw/components/IconButton";
+import { LinkIcon } from "@excalidraw/excalidraw/components/icons";
 import { Tooltip } from "@excalidraw/excalidraw/components/Tooltip";
+import { t } from "@excalidraw/excalidraw/i18n";
 import React, { useEffect } from "react";
 
 import type { EditorInterface } from "@excalidraw/common";
@@ -76,4 +80,31 @@ export const DemoShareButton = ({
       {DISABLED_REASON}
     </span>
   </Tooltip>
+);
+
+/**
+ * The main menu's "Save to…" dialog, "Shareable link" card, present but inert.
+ * Same icon, title and button as the real one, so the dialog keeps its shape;
+ * the reason is written on the card rather than tucked into a tooltip.
+ */
+export const DemoShareLinkCard = () => (
+  <div className="demo-link-card">
+    <Card color="pink">
+      <div className="Card-icon">{LinkIcon}</div>
+      <h2>{t("exportDialog.link_title")}</h2>
+      <div className="Card-details">
+        Off in this demo: it would upload your drawing to Excalidraw's own
+        servers.
+      </div>
+      <IconButton
+        className="Card-button"
+        type="button"
+        title={t("exportDialog.link_button")}
+        aria-label={t("exportDialog.link_button")}
+        showAriaLabel={true}
+        disabled
+        onClick={() => {}}
+      />
+    </Card>
+  </div>
 );

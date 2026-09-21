@@ -1,52 +1,31 @@
+// The cards come from Excalidraw's own Card / ExportDialog styles; this file
+// only corrects what they get wrong for WCAG AA, which the house dialog
+// doesn't meet either.
 .excalidraw {
-  .c1-save-formats {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    &__option {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.125rem;
-      width: 100%;
-      min-height: 44px;
-      padding: 0.75rem 1rem;
-      box-sizing: border-box;
-
-      border: 1px solid var(--default-border-color);
-      border-radius: var(--border-radius-lg);
-      background-color: var(--island-bg-color);
-      color: var(--color-on-surface);
-      font-family: var(--ui-font);
-      text-align: left;
-      cursor: pointer;
-
-      &:hover:not(:disabled) {
-        background-color: var(--button-hover-bg);
-        border-color: var(--color-primary);
-      }
-
-      &:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
-      }
-    }
-
-    &__label {
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    // Same pair as the card's body text: Excalidraw's greys don't flip with
-    // the theme, so dark mode needs its own step to clear 4.5:1.
-    &__description {
-      font-size: 0.875rem;
-      color: var(--color-gray-70);
-    }
+  .c1-save-formats__card {
+    display: contents;
   }
 
-  &.theme--dark .c1-save-formats__description {
-    color: var(--color-gray-40);
+  // White on Excalidraw's lime (#74b816) is 2.44:1. --color-gray-100 is fixed
+  // at #121212 in both themes, 7.7:1 on the lime.
+  .c1-save-formats__card--lime
+    .Card
+    .Card-button.ToolIcon_type_button
+    .ToolIcon__label {
+    color: var(--color-gray-100);
+  }
+
+  // --color-primary lightens in dark mode, where white on it falls to 2.21:1.
+  // --color-surface-lowest flips with it: white in light, near-black in dark.
+  .c1-save-formats__card--primary
+    .Card
+    .Card-button.ToolIcon_type_button
+    .ToolIcon__label {
+    color: var(--color-surface-lowest);
+  }
+
+  .c1-save-formats .Card-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 }

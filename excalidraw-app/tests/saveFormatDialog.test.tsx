@@ -43,25 +43,46 @@ const api = (elements: unknown[] = [{ id: "rect" }]) =>
     setToast: vi.fn(),
   } as unknown as ExcalidrawImperativeAPI);
 
-const option = (label: string) =>
-  screen.getByRole("button", { name: new RegExp(`^${label}`) });
+const option = (name: string) => screen.getByRole("button", { name });
 
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 describe("SaveFormatOptions", () => {
-  it("offers the Excalidraw file first, then PNG and SVG", () => {
+  it("offers the Excalidraw file first, then PNG and SVG, one card each", () => {
     render(<SaveFormatOptions hasContent busy={false} onChoose={() => {}} />);
 
     expect(
-      screen.getAllByRole("button").map((button) => button.textContent),
-    ).toEqual(SAVE_FORMATS.map((f) => `${f.label}${f.description}`));
-    expect(SAVE_FORMATS.map((f) => f.format)).toEqual([
-      "excalidraw",
-      "png",
-      "svg",
-    ]);
+      screen.getAllByRole("heading").map((heading) => heading.textContent),
+    ).toEqual(SAVE_FORMATS.map((f) => f.label));
+    expect(
+      screen.getAllByRole("button").map((b) => b.getAttribute("aria-label")),
+    ).toEqual(["Save as Excalidraw", "Save as PNG", "Save as SVG"]);
+    for (const { description } of SAVE_FORMATS) {
+      expect(screen.getByText(description)).toBeTruthy();
+    }
+  });
+
+  it("uses the same card pieces as the main menu's Save to… dialog", () => {
+    const { container } = render(
+      <SaveFormatOptions hasContent busy={false} onChoose={() => {}} />,
+    );
+
+    expect(
+      container.querySelector(".ExportDialog--json .ExportDialog-cards"),
+    ).not.toBeNull();
+    expect(container.querySelectorAll(".Card")).toHaveLength(3);
+    expect(container.querySelectorAll(".Card .Card-icon svg")).toHaveLength(3);
+  });
+
+  it("hands back the chosen format", () => {
+    const onChoose = vi.fn();
+    render(<SaveFormatOptions hasContent busy={false} onChoose={onChoose} />);
+
+    fireEvent.click(option("Save as SVG"));
+
+    expect(onChoose).toHaveBeenCalledWith("svg");
   });
 
   it("holds the image formats on an empty canvas and says why", () => {
@@ -69,10 +90,23 @@ describe("SaveFormatOptions", () => {
       <SaveFormatOptions hasContent={false} busy={false} onChoose={() => {}} />,
     );
 
-    expect(option("Excalidraw file")).not.toBeDisabled();
-    expect(option("PNG image")).toBeDisabled();
-    expect(option("SVG image")).toBeDisabled();
+    expect(option("Save as Excalidraw")).not.toBeDisabled();
+    expect(option("Save as PNG")).toBeDisabled();
+    expect(option("Save as SVG")).toBeDisabled();
     expect(screen.getAllByText(SAVE_DIALOG_COPY.needsContent)).toHaveLength(2);
+  });
+
+  it("puts keyboard focus on the first card, not the second", () => {
+    render(
+      <SaveFormatOptions
+        autoFocus
+        hasContent
+        busy={false}
+        onChoose={() => {}}
+      />,
+    );
+
+    expect(document.activeElement).toBe(option("Save as Excalidraw"));
   });
 
   it("locks every choice while a save is running", () => {
@@ -127,7 +161,7 @@ describe("SaveFormatDialog", () => {
       />,
     );
 
-    fireEvent.click(option("PNG image"));
+    fireEvent.click(option("Save as PNG"));
 
     await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     expect(onSaved).toHaveBeenCalledTimes(1);
@@ -148,7 +182,7 @@ describe("SaveFormatDialog", () => {
       />,
     );
 
-    fireEvent.click(option("PNG image"));
+    fireEvent.click(option("Save as PNG"));
 
     await waitFor(() =>
       expect(editor.setToast).toHaveBeenCalledWith(
@@ -158,6 +192,6 @@ describe("SaveFormatDialog", () => {
     expect(onSaved).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
     // Unlocked again, so they can retry or pick another format.
-    expect(option("PNG image")).not.toBeDisabled();
+    expect(option("Save as PNG")).not.toBeDisabled();
   });
 });
