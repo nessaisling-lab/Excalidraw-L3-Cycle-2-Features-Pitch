@@ -143,8 +143,16 @@ import DebugCanvas, {
 import { useSimulatedCollaborators } from "./debugCollaborators";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
-import { downloadScene } from "./persistent-save/downloadScene";
+import { isSaveTreatmentOn } from "./persistent-save/demoArm";
 import { PersistentSaveButton } from "./persistent-save/PersistentSaveButton";
+import { PersistentSavePrompt } from "./persistent-save/PersistentSavePrompt";
+import { SaveFormatDialog } from "./persistent-save/SaveFormatDialog";
+import {
+  DemoBadge,
+  DemoShareButton,
+  IS_DEMO_BUILD,
+  useDemoTitle,
+} from "./demo/DemoBuild";
 
 import "./index.scss";
 
@@ -377,6 +385,8 @@ const initializeScene = async (opts: {
 const ExcalidrawWrapper = () => {
   const excalidrawAPI = useExcalidrawAPI();
 
+  useDemoTitle();
+
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
@@ -408,6 +418,11 @@ const ExcalidrawWrapper = () => {
   }, []);
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
+  // The format picker both save surfaces open. `onSaved` is the card's hook
+  // for recording a completed save; the persistent button has none.
+  const [saveFormatDialog, setSaveFormatDialog] = useState<{
+    onSaved?: () => void;
+  } | null>(null);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
@@ -1001,26 +1016,30 @@ const ExcalidrawWrapper = () => {
 
           return (
             <div className="excalidraw-ui-top-right">
-              <PersistentSaveButton
-                isPlusSignedUser={isExcalidrawPlusSignedUser}
-                viewModeEnabled={Boolean(appState.viewModeEnabled)}
-                onSave={() => {
-                  if (excalidrawAPI) {
-                    downloadScene(excalidrawAPI);
-                  }
-                }}
-              />
+              {isSaveTreatmentOn() && (
+                <PersistentSaveButton
+                  isPlusSignedUser={isExcalidrawPlusSignedUser}
+                  viewModeEnabled={Boolean(appState.viewModeEnabled)}
+                  onSave={() => setSaveFormatDialog({})}
+                />
+              )}
               {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
                 <ExcalidrawPlusPromoBanner
                   isSignedIn={isExcalidrawPlusSignedUser}
                 />
               )}
 
-              {!isCollabDisabled && collabAPI && (
-                <>
-                  {collabError.message && (
-                    <CollabError collabError={collabError} />
-                  )}
+              {collabError.message && <CollabError collabError={collabError} />}
+              {/*
+                The demo's disabled Share button deliberately sits outside the
+                collab guard: it has to stay visible and explain itself on
+                hover. Only the real trigger is gated on collab being available.
+              */}
+              {IS_DEMO_BUILD ? (
+                <DemoShareButton editorInterface={editorInterface} />
+              ) : (
+                !isCollabDisabled &&
+                collabAPI && (
                   <LiveCollaborationTrigger
                     isCollaborating={isCollaborating}
                     onSelect={() =>
@@ -1028,7 +1047,7 @@ const ExcalidrawWrapper = () => {
                     }
                     editorInterface={editorInterface}
                   />
-                </>
+                )
               )}
             </div>
           );
@@ -1077,6 +1096,19 @@ const ExcalidrawWrapper = () => {
         </OverwriteConfirmDialog>
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
+        {excalidrawAPI && !isCollaborating && (
+          <PersistentSavePrompt
+            onSaveRequest={(onSaved) => setSaveFormatDialog({ onSaved })}
+          />
+        )}
+        {excalidrawAPI && saveFormatDialog && (
+          <SaveFormatDialog
+            excalidrawAPI={excalidrawAPI}
+            onSaved={saveFormatDialog.onSaved}
+            onClose={() => setSaveFormatDialog(null)}
+          />
+        )}
+        <DemoBadge />
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (

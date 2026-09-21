@@ -1,0 +1,163 @@
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import React from "react";
+import { vi } from "vitest";
+
+import { exportToBlob, exportToSvg } from "@excalidraw/excalidraw";
+
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
+import { downloadBlob, downloadScene } from "../persistent-save/downloadScene";
+import {
+  SAVE_DIALOG_COPY,
+  SaveFormatDialog,
+  SaveFormatOptions,
+} from "../persistent-save/SaveFormatDialog";
+import { SAVE_FORMATS, saveInFormat } from "../persistent-save/saveFormats";
+
+vi.mock("@excalidraw/excalidraw", () => ({
+  exportToBlob: vi.fn(async () => new Blob(["png"], { type: "image/png" })),
+  exportToSvg: vi.fn(async () => ({ outerHTML: "<svg></svg>" })),
+}));
+
+// The real download path has its own tests; here only the routing matters.
+vi.mock("../persistent-save/downloadScene", () => ({
+  downloadBlob: vi.fn(),
+  downloadScene: vi.fn(),
+  sceneFilename: (api: ExcalidrawImperativeAPI, extension: string) =>
+    `${api.getName() || "Untitled"}.${extension}`,
+}));
+
+// <Dialog> needs the whole editor around it; its chrome isn't under test.
+vi.mock("@excalidraw/excalidraw/components/Dialog", () => ({
+  Dialog: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+}));
+
+const api = (elements: unknown[] = [{ id: "rect" }]) =>
+  ({
+    getSceneElements: () => elements,
+    getAppState: () => ({ exportBackground: true }),
+    getFiles: () => ({}),
+    getName: () => "My diagram",
+    setToast: vi.fn(),
+  } as unknown as ExcalidrawImperativeAPI);
+
+const option = (label: string) =>
+  screen.getByRole("button", { name: new RegExp(`^${label}`) });
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
+describe("SaveFormatOptions", () => {
+  it("offers the Excalidraw file first, then PNG and SVG", () => {
+    render(<SaveFormatOptions hasContent busy={false} onChoose={() => {}} />);
+
+    expect(
+      screen.getAllByRole("button").map((button) => button.textContent),
+    ).toEqual(SAVE_FORMATS.map((f) => `${f.label}${f.description}`));
+    expect(SAVE_FORMATS.map((f) => f.format)).toEqual([
+      "excalidraw",
+      "png",
+      "svg",
+    ]);
+  });
+
+  it("holds the image formats on an empty canvas and says why", () => {
+    render(
+      <SaveFormatOptions hasContent={false} busy={false} onChoose={() => {}} />,
+    );
+
+    expect(option("Excalidraw file")).not.toBeDisabled();
+    expect(option("PNG image")).toBeDisabled();
+    expect(option("SVG image")).toBeDisabled();
+    expect(screen.getAllByText(SAVE_DIALOG_COPY.needsContent)).toHaveLength(2);
+  });
+
+  it("locks every choice while a save is running", () => {
+    render(<SaveFormatOptions hasContent busy onChoose={() => {}} />);
+
+    for (const button of screen.getAllByRole("button")) {
+      expect(button).toBeDisabled();
+    }
+  });
+});
+
+describe("saveInFormat", () => {
+  it("saves the editable scene through the .excalidraw download", async () => {
+    const editor = api();
+    await saveInFormat(editor, "excalidraw");
+
+    expect(downloadScene).toHaveBeenCalledWith(editor);
+    expect(exportToBlob).not.toHaveBeenCalled();
+  });
+
+  it("exports a PNG and downloads it under the drawing's name", async () => {
+    await saveInFormat(api(), "png");
+
+    expect(exportToBlob).toHaveBeenCalledWith(
+      expect.objectContaining({ mimeType: "image/png" }),
+    );
+    expect(downloadBlob).toHaveBeenCalledWith(
+      expect.any(Blob),
+      "My diagram.png",
+    );
+  });
+
+  it("exports an SVG as an SVG file", async () => {
+    await saveInFormat(api(), "svg");
+
+    expect(exportToSvg).toHaveBeenCalled();
+    const [blob, filename] = vi.mocked(downloadBlob).mock.calls[0];
+    expect(blob.type).toBe("image/svg+xml");
+    expect(filename).toBe("My diagram.svg");
+  });
+});
+
+describe("SaveFormatDialog", () => {
+  it("counts a save and closes only after the file is written", async () => {
+    const onSaved = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <SaveFormatDialog
+        excalidrawAPI={api()}
+        onSaved={onSaved}
+        onClose={onClose}
+      />,
+    );
+
+    fireEvent.click(option("PNG image"));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    expect(onSaved).toHaveBeenCalledTimes(1);
+    expect(downloadBlob).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not count a failed save, keeps the dialog open, and says so", async () => {
+    vi.mocked(exportToBlob).mockRejectedValueOnce(new Error("canvas too big"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const editor = api();
+    const onSaved = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <SaveFormatDialog
+        excalidrawAPI={editor}
+        onSaved={onSaved}
+        onClose={onClose}
+      />,
+    );
+
+    fireEvent.click(option("PNG image"));
+
+    await waitFor(() =>
+      expect(editor.setToast).toHaveBeenCalledWith(
+        expect.objectContaining({ message: SAVE_DIALOG_COPY.failed }),
+      ),
+    );
+    expect(onSaved).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+    // Unlocked again, so they can retry or pick another format.
+    expect(option("PNG image")).not.toBeDisabled();
+  });
+});

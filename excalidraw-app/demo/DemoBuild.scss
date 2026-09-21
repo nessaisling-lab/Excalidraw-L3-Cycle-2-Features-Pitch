@@ -1,0 +1,69 @@
+.excalidraw {
+  // Demo-build scaffolding. Present only when VITE_APP_IS_DEMO is set.
+
+  // Disabled controls stay visible and legible — muted enough to read as
+  // unavailable, not so faint that the label becomes unreadable.
+  .collab-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none; // let the tooltip wrapper take the hover instead
+  }
+
+  .demo-menu-item--disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+// Outside the .excalidraw block: the badge is a sibling of the editor, not a
+// child of it.
+.demo-badge {
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  translate: -50% 0;
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  max-width: min(560px, calc(100vw - 2rem));
+  padding: 6px 12px 6px 6px;
+  box-sizing: border-box;
+
+  background: var(--island-bg-color, #fff);
+  border: 1px solid var(--default-border-color, #e9ecef);
+  border-radius: 999px;
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.17), 0px 2px 6px rgba(0, 0, 0, 0.08);
+
+  font-family: var(--ui-font);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-gray-70, #5c5c5c);
+
+  // The canvas keeps working underneath it.
+  pointer-events: none;
+  user-select: none;
+
+  &__tag {
+    flex: none;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--color-primary, #6965db);
+    color: var(--color-surface-lowest, #fff);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  // The bottom bar gets crowded on small screens; the badge is the first thing
+  // that can go, since the tab title still carries the marker.
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.excalidraw.theme--dark .demo-badge,
+.theme--dark .demo-badge {
+  color: var(--color-gray-40, #b8b8b8);
+}
