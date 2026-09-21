@@ -10,8 +10,8 @@ import React from "react";
  * Visibility is passed in rather than read here, so the rules are testable
  * without mounting the whole editor.
  */
-export const SAVE_BUTTON_LABEL = "Save File";
-export const SAVE_BUTTON_TITLE = "Save File (Ctrl/Cmd+S)";
+export const SAVE_BUTTON_LABEL = "Save to file";
+export const SAVE_BUTTON_TITLE = "Save to file (Ctrl/Cmd+S)";
 
 export const PersistentSaveButton = ({
   isPlusSignedUser,
