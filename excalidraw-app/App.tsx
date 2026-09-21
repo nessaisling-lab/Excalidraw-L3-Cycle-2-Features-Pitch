@@ -143,7 +143,10 @@ import DebugCanvas, {
 import { useSimulatedCollaborators } from "./debugCollaborators";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { isSaveTreatmentOn } from "./persistent-save/demoArm";
+import { PersistentSaveButton } from "./persistent-save/PersistentSaveButton";
 import { PersistentSavePrompt } from "./persistent-save/PersistentSavePrompt";
+import { SaveFormatDialog } from "./persistent-save/SaveFormatDialog";
 import {
   DemoBadge,
   DemoShareButton,
@@ -415,6 +418,11 @@ const ExcalidrawWrapper = () => {
   }, []);
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
+  // The format picker both save surfaces open. `onSaved` is the card's hook
+  // for recording a completed save; the persistent button has none.
+  const [saveFormatDialog, setSaveFormatDialog] = useState<{
+    onSaved?: () => void;
+  } | null>(null);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
@@ -1001,13 +1009,20 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={editorTheme}
         onThemeChange={setAppTheme}
-        renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || isCollabDisabled) {
+        renderTopRightUI={(isMobile, appState) => {
+          if (isMobile) {
             return null;
           }
 
           return (
             <div className="excalidraw-ui-top-right">
+              {isSaveTreatmentOn() && (
+                <PersistentSaveButton
+                  isPlusSignedUser={isExcalidrawPlusSignedUser}
+                  viewModeEnabled={Boolean(appState.viewModeEnabled)}
+                  onSave={() => setSaveFormatDialog({})}
+                />
+              )}
               {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
                 <ExcalidrawPlusPromoBanner
                   isSignedIn={isExcalidrawPlusSignedUser}
@@ -1015,16 +1030,24 @@ const ExcalidrawWrapper = () => {
               )}
 
               {collabError.message && <CollabError collabError={collabError} />}
+              {/*
+                The demo's disabled Share button deliberately sits outside the
+                collab guard: it has to stay visible and explain itself on
+                hover. Only the real trigger is gated on collab being available.
+              */}
               {IS_DEMO_BUILD ? (
                 <DemoShareButton editorInterface={editorInterface} />
               ) : (
-                <LiveCollaborationTrigger
-                  isCollaborating={isCollaborating}
-                  onSelect={() =>
-                    setShareDialogState({ isOpen: true, type: "share" })
-                  }
-                  editorInterface={editorInterface}
-                />
+                !isCollabDisabled &&
+                collabAPI && (
+                  <LiveCollaborationTrigger
+                    isCollaborating={isCollaborating}
+                    onSelect={() =>
+                      setShareDialogState({ isOpen: true, type: "share" })
+                    }
+                    editorInterface={editorInterface}
+                  />
+                )
               )}
             </div>
           );
@@ -1074,7 +1097,16 @@ const ExcalidrawWrapper = () => {
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
         {excalidrawAPI && !isCollaborating && (
-          <PersistentSavePrompt excalidrawAPI={excalidrawAPI} />
+          <PersistentSavePrompt
+            onSaveRequest={(onSaved) => setSaveFormatDialog({ onSaved })}
+          />
+        )}
+        {excalidrawAPI && saveFormatDialog && (
+          <SaveFormatDialog
+            excalidrawAPI={excalidrawAPI}
+            onSaved={saveFormatDialog.onSaved}
+            onClose={() => setSaveFormatDialog(null)}
+          />
         )}
         <DemoBadge />
 

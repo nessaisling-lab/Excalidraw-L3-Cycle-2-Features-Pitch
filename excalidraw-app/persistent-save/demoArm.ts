@@ -1,6 +1,6 @@
 import { STORAGE_KEYS } from "../app_constants";
 
-import { ALLOW_TEST_OVERRIDES } from "./config";
+import { ALLOW_TEST_OVERRIDES, C1_ENABLED } from "./config";
 
 /**
  * The demo A/B switch: `?arm=control` for today's experience, `?arm=nudge`
@@ -80,3 +80,17 @@ export const getDemoArm = (): DemoArm => {
 
   return arm;
 };
+
+let treatmentOn: boolean | undefined;
+
+/**
+ * Whether this load shows the save treatment: the prompt and the persistent
+ * button together, because the bundle is what's being tested. Both surfaces
+ * read this one answer so they can never disagree — `?arm=control` hides
+ * both, which is what "today's experience" means.
+ *
+ * Settled once per load, like the arm itself; the top-right cluster re-renders
+ * constantly and shouldn't touch storage each time.
+ */
+export const isSaveTreatmentOn = (): boolean =>
+  (treatmentOn ??= C1_ENABLED && getDemoArm() !== "control");
