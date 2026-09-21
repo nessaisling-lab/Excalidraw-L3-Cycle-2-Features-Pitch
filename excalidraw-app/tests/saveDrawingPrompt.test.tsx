@@ -40,12 +40,14 @@ describe("SaveDrawingPrompt", () => {
   });
 
   it("announces itself politely without stealing focus", () => {
-    const { container } = setup();
-    const region = container.querySelector(".c1-save-prompt")!;
+    setup();
+    const region = screen.getByRole("status");
 
-    expect(region.getAttribute("role")).toBe("status");
     expect(region.getAttribute("aria-live")).toBe("polite");
-    expect(region.textContent).toContain(PROMPT_COPY.announcement);
+    expect(region.textContent).toBe(PROMPT_COPY.announcement);
+    // The announcement repeats the headline, so the visible card must sit
+    // outside the live region or a screen reader reads it twice.
+    expect(region.contains(screen.getByText(PROMPT_COPY.headline))).toBe(false);
     // Focus stays wherever the user left it — on the canvas.
     expect(document.activeElement).toBe(document.body);
   });

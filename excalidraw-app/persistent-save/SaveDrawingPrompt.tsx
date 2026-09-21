@@ -18,10 +18,13 @@ export const PROMPT_COPY = {
   headline: "Save your drawing",
   body: "Download a copy to your device so you can keep working with it later.",
   save: "Save to file",
-  /** Read once by screen readers via the live region; see PRD §6a. */
+  /**
+   * Read once by screen readers via the live region. Wording approved by
+   * Lawrence, 2026-09-20 (PRD §6a) — it must match the visible card exactly.
+   */
   announcement:
-    "Your drawing is only saved in this browser. Save to file, or dismiss.",
-  dismissLabel: "Dismiss save reminder",
+    "Save your drawing. Download a copy to your device so you can keep working with it later. Save to file, or dismiss.",
+  dismissLabel: "Dismiss",
 } as const;
 
 const DismissIcon = () => (
@@ -76,13 +79,14 @@ export const SaveDrawingPrompt = ({
     <div
       ref={containerRef}
       className={clsx("c1-save-prompt", `c1-save-prompt--${anchor}`)}
-      // Announced once, politely, without moving focus away from the canvas.
-      role="status"
-      aria-live="polite"
     >
-      {/* The visible headline is not the announcement: on its own it doesn't
-          say why saving matters, which is the whole point of the prompt. */}
-      <span className="visually-hidden">{PROMPT_COPY.announcement}</span>
+      {/* The live region is this span alone, not the whole card. The approved
+          announcement repeats the headline and body, so a card-wide region
+          would read them twice. Announced once, politely, without moving
+          focus away from the canvas. */}
+      <span className="visually-hidden" role="status" aria-live="polite">
+        {PROMPT_COPY.announcement}
+      </span>
 
       <p className="c1-save-prompt__headline">{PROMPT_COPY.headline}</p>
       <p className="c1-save-prompt__body">{PROMPT_COPY.body}</p>
