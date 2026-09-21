@@ -7,6 +7,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { STORAGE_KEYS } from "../app_constants";
 
 import {
+  C1_SAVED_EVENT,
   clearC1Record,
   initC1Session,
   isPromptSpent,
@@ -165,6 +166,12 @@ export const usePersistentSavePrompt = ({
     setVisible(false);
     markC1State("saved");
   }, []);
+
+  // A save from the persistent button counts too (PRD §5).
+  useEffect(() => {
+    window.addEventListener(C1_SAVED_EVENT, recordSave);
+    return () => window.removeEventListener(C1_SAVED_EVENT, recordSave);
+  }, [recordSave]);
 
   return { visible, dismiss, recordSave };
 };

@@ -2,11 +2,13 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import { STORAGE_KEYS } from "../app_constants";
 import {
+  C1_SAVED_EVENT,
   clearC1Record,
   initC1Session,
   isPromptSpent,
   markC1State,
   readC1Record,
+  recordC1Save,
   subscribeToC1Changes,
 } from "../persistent-save/c1State";
 import { C1_DEFAULTS, resolveC1Config } from "../persistent-save/config";
@@ -254,6 +256,20 @@ describe("C1 session record", () => {
 
   it("does nothing when there is no record to advance", () => {
     expect(markC1State("shown")).toBe(false);
+  });
+
+  it("ends the prompt on a save from any surface, and tells this tab", () => {
+    initC1Session({ hasSceneData: false, now: 1000 });
+    const heard = vi.fn();
+    window.addEventListener(C1_SAVED_EVENT, heard);
+
+    recordC1Save();
+
+    window.removeEventListener(C1_SAVED_EVENT, heard);
+    // Storage events only reach other tabs, so this tab needs its own signal.
+    expect(heard).toHaveBeenCalledTimes(1);
+    expect(readC1Record()?.state).toBe("saved");
+    expect(isPromptSpent(readC1Record())).toBe(true);
   });
 
   it("can be forgotten, so the prompt becomes eligible again", () => {

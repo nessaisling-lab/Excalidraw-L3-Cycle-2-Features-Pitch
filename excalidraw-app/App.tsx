@@ -143,6 +143,7 @@ import DebugCanvas, {
 import { useSimulatedCollaborators } from "./debugCollaborators";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { recordC1Save } from "./persistent-save/c1State";
 import { isSaveTreatmentOn } from "./persistent-save/demoArm";
 import { PersistentSaveButton } from "./persistent-save/PersistentSaveButton";
 import { PersistentSavePrompt } from "./persistent-save/PersistentSavePrompt";
@@ -150,6 +151,7 @@ import { SaveFormatDialog } from "./persistent-save/SaveFormatDialog";
 import {
   DemoBadge,
   DemoShareButton,
+  DemoShareLinkCard,
   IS_DEMO_BUILD,
   useDemoTitle,
 } from "./demo/DemoBuild";
@@ -418,11 +420,8 @@ const ExcalidrawWrapper = () => {
   }, []);
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
-  // The format picker both save surfaces open. `onSaved` is the card's hook
-  // for recording a completed save; the persistent button has none.
-  const [saveFormatDialog, setSaveFormatDialog] = useState<{
-    onSaved?: () => void;
-  } | null>(null);
+  // The format picker both save surfaces open.
+  const [isSaveFormatDialogOpen, setSaveFormatDialogOpen] = useState(false);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
@@ -974,28 +973,33 @@ const ExcalidrawWrapper = () => {
           canvasActions: {
             toggleTheme: true,
             export: {
-              onExportToBackend,
+              // In the demo the backend is switched off, so the real link card
+              // gives way to an inert one that says why, in the same slot.
+              onExportToBackend: IS_DEMO_BUILD ? undefined : onExportToBackend,
               renderCustomUI: excalidrawAPI
                 ? (elements, appState, files) => {
                     return (
-                      <ExportToExcalidrawPlus
-                        elements={elements}
-                        appState={appState}
-                        files={files}
-                        name={excalidrawAPI.getName()}
-                        onError={(error) => {
-                          excalidrawAPI?.updateScene({
-                            appState: {
-                              errorMessage: error.message,
-                            },
-                          });
-                        }}
-                        onSuccess={() => {
-                          excalidrawAPI.updateScene({
-                            appState: { openDialog: null },
-                          });
-                        }}
-                      />
+                      <>
+                        {IS_DEMO_BUILD && <DemoShareLinkCard />}
+                        <ExportToExcalidrawPlus
+                          elements={elements}
+                          appState={appState}
+                          files={files}
+                          name={excalidrawAPI.getName()}
+                          onError={(error) => {
+                            excalidrawAPI?.updateScene({
+                              appState: {
+                                errorMessage: error.message,
+                              },
+                            });
+                          }}
+                          onSuccess={() => {
+                            excalidrawAPI.updateScene({
+                              appState: { openDialog: null },
+                            });
+                          }}
+                        />
+                      </>
                     );
                   }
                 : undefined,
@@ -1020,7 +1024,7 @@ const ExcalidrawWrapper = () => {
                 <PersistentSaveButton
                   isPlusSignedUser={isExcalidrawPlusSignedUser}
                   viewModeEnabled={Boolean(appState.viewModeEnabled)}
-                  onSave={() => setSaveFormatDialog({})}
+                  onSave={() => setSaveFormatDialogOpen(true)}
                 />
               )}
               {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
@@ -1098,14 +1102,15 @@ const ExcalidrawWrapper = () => {
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
         {excalidrawAPI && !isCollaborating && (
           <PersistentSavePrompt
-            onSaveRequest={(onSaved) => setSaveFormatDialog({ onSaved })}
+            onSaveRequest={() => setSaveFormatDialogOpen(true)}
           />
         )}
-        {excalidrawAPI && saveFormatDialog && (
+        {excalidrawAPI && isSaveFormatDialogOpen && (
           <SaveFormatDialog
             excalidrawAPI={excalidrawAPI}
-            onSaved={saveFormatDialog.onSaved}
-            onClose={() => setSaveFormatDialog(null)}
+            // Any completed save ends the card, whichever surface opened this.
+            onSaved={recordC1Save}
+            onClose={() => setSaveFormatDialogOpen(false)}
           />
         )}
         <DemoBadge />

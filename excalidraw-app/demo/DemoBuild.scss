@@ -67,3 +67,14 @@
 .theme--dark .demo-badge {
   color: var(--color-gray-40, #b8b8b8);
 }
+
+// Sits in the "Save to…" dialog's card grid; `display: contents` keeps the
+// card itself as the grid item.
+.excalidraw .demo-link-card {
+  display: contents;
+
+  .Card-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}

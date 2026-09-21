@@ -1,5 +1,14 @@
+import { Card } from "@excalidraw/excalidraw/components/Card";
 import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
-import React, { useState } from "react";
+import { IconButton } from "@excalidraw/excalidraw/components/IconButton";
+import {
+  exportToFileIcon,
+  pngIcon,
+  svgIcon,
+} from "@excalidraw/excalidraw/components/icons";
+import React, { useEffect, useRef, useState } from "react";
+
+import "@excalidraw/excalidraw/components/ExportDialog.scss";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
@@ -13,9 +22,28 @@ import type { SaveFormat } from "./saveFormats";
 export const SAVE_DIALOG_COPY = {
   title: "Save to file",
   group: "File format",
-  needsContent: "Draw something first",
+  needsContent: "Draw something first.",
   failed: "Couldn't save the file. Please try again.",
 } as const;
+
+/**
+ * Each format as a card, built from the same pieces as the main menu's
+ * "Save to…" dialog so the two read as one family — Carlos, 2026-09-21: "keep
+ * them the same and on-brand". The Excalidraw file takes that dialog's lime,
+ * because it is the same action as its "Save to disk".
+ */
+const CARD_STYLE: Record<
+  SaveFormat,
+  { color: "lime" | "primary" | "pink"; icon: React.ReactNode; button: string }
+> = {
+  excalidraw: {
+    color: "lime",
+    icon: exportToFileIcon,
+    button: "Save as Excalidraw",
+  },
+  png: { color: "primary", icon: pngIcon, button: "Save as PNG" },
+  svg: { color: "pink", icon: svgIcon, button: "Save as SVG" },
+};
 
 /**
  * The format choices on their own, so they can be tested without mounting the
@@ -25,36 +53,65 @@ export const SaveFormatOptions = ({
   hasContent,
   busy,
   onChoose,
+  autoFocus = false,
 }: {
   hasContent: boolean;
   /** A save is in progress; a second click would download twice. */
   busy: boolean;
   onChoose: (format: SaveFormat) => void;
-}) => (
-  <div
-    className="c1-save-formats"
-    role="group"
-    aria-label={SAVE_DIALOG_COPY.group}
-  >
-    {SAVE_FORMATS.map(({ format, label, description, needsContent }) => {
-      const blocked = needsContent && !hasContent;
-      return (
-        <button
-          key={format}
-          type="button"
-          className="c1-save-formats__option"
-          disabled={busy || blocked}
-          onClick={() => onChoose(format)}
-        >
-          <span className="c1-save-formats__label">{label}</span>
-          <span className="c1-save-formats__description">
-            {blocked ? SAVE_DIALOG_COPY.needsContent : description}
-          </span>
-        </button>
-      );
-    })}
-  </div>
-);
+  /** Put keyboard focus on the first card that can be used. */
+  autoFocus?: boolean;
+}) => {
+  const cardsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (autoFocus) {
+      cardsRef.current
+        ?.querySelector<HTMLButtonElement>(".Card-button:not(:disabled)")
+        ?.focus();
+    }
+  }, [autoFocus]);
+
+  return (
+    <div className="ExportDialog ExportDialog--json">
+      <div
+        ref={cardsRef}
+        className="ExportDialog-cards c1-save-formats"
+        role="group"
+        aria-label={SAVE_DIALOG_COPY.group}
+      >
+        {SAVE_FORMATS.map(({ format, label, description, needsContent }) => {
+          const { color, icon, button } = CARD_STYLE[format];
+          const blocked = needsContent && !hasContent;
+          return (
+            // Styling hook only; `display: contents` keeps the card in the grid.
+            <div
+              key={format}
+              className={`c1-save-formats__card c1-save-formats__card--${color}`}
+            >
+              <Card color={color}>
+                <div className="Card-icon">{icon}</div>
+                <h2>{label}</h2>
+                <div className="Card-details">
+                  {blocked ? SAVE_DIALOG_COPY.needsContent : description}
+                </div>
+                <IconButton
+                  className="Card-button"
+                  type="button"
+                  title={button}
+                  aria-label={button}
+                  showAriaLabel={true}
+                  disabled={busy || blocked}
+                  onClick={() => onChoose(format)}
+                />
+              </Card>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 /**
  * What "Save to file" opens, from either surface. Downloads straight to the
@@ -71,6 +128,9 @@ export const SaveFormatDialog = ({
   onSaved?: () => void;
 }) => {
   const [busy, setBusy] = useState(false);
+  // <Dialog> hands focus back only when it is dismissed, not when we close it
+  // after a save — so remember what opened it and do it ourselves.
+  const opener = useRef(document.activeElement as HTMLElement | null);
 
   const choose = async (format: SaveFormat) => {
     setBusy(true);
@@ -78,6 +138,10 @@ export const SaveFormatDialog = ({
       await saveInFormat(excalidrawAPI, format);
       onSaved?.();
       onClose();
+      // The card's own button is gone once it clears; nothing to return to.
+      if (opener.current?.isConnected) {
+        opener.current.focus();
+      }
     } catch (error) {
       console.error(error);
       excalidrawAPI.setToast({
@@ -90,12 +154,15 @@ export const SaveFormatDialog = ({
 
   return (
     <Dialog
-      size="small"
       title={SAVE_DIALOG_COPY.title}
       onCloseRequest={onClose}
       className="c1-save-format-dialog"
+      // Its default focuses the *second* control, assuming the first is a
+      // close button that only exists on phones. We focus the first card.
+      autofocus={false}
     >
       <SaveFormatOptions
+        autoFocus
         hasContent={excalidrawAPI.getSceneElements().length > 0}
         busy={busy}
         onChoose={choose}
