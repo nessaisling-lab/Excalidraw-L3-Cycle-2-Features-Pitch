@@ -195,7 +195,12 @@ export const SaveFormatDialog = ({
       await saveInFormat(excalidrawAPI, format);
       onSaved?.();
       onClose();
-      returnFocus(opener.current);
+      // Both of those are state setters, so nothing has re-rendered yet: the
+      // card's button is still in the document even when this save is what
+      // removes it. Deciding now would always pick it, and focus would land on
+      // <body> a moment later when React took it away. A macrotask runs after
+      // React has committed, so by then the opener is gone if it is going.
+      setTimeout(() => returnFocus(opener.current));
     } catch (error) {
       console.error(error);
       excalidrawAPI.setToast({

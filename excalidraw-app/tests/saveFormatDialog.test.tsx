@@ -278,8 +278,14 @@ describe("SaveFormatDialog", () => {
 
   it("hands focus to the persistent button when the opener has gone", async () => {
     // Saving from the card clears the card, so the button that opened the
-    // dialog is detached by the time the save resolves. Without a fallback the
-    // browser drops focus on <body> and a keyboard user loses their place.
+    // dialog goes away. Without a fallback the browser drops focus on <body>
+    // and a keyboard user loses their place.
+    //
+    // The removal is deferred here on purpose. onSaved and onClose are state
+    // setters, so in the real app the opener is still in the document when they
+    // return and only leaves once React commits. Removing it synchronously
+    // would let a same-tick fallback pass a test while failing in the browser,
+    // which is exactly what happened once.
     const cardButton = document.createElement("button");
     document.body.append(cardButton);
     cardButton.focus();
@@ -291,7 +297,7 @@ describe("SaveFormatDialog", () => {
     render(
       <SaveFormatDialog
         excalidrawAPI={api()}
-        onSaved={() => cardButton.remove()}
+        onSaved={() => setTimeout(() => cardButton.remove())}
         onClose={() => {}}
       />,
     );
