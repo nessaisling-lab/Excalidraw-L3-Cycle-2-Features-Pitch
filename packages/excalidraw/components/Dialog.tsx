@@ -108,7 +108,10 @@ export const Dialog = (props: DialogProps) => {
       className={clsx("Dialog", props.className, {
         "Dialog--fullscreen": isFullscreen,
       })}
-      labelledBy="dialog-title"
+      // The heading below is rendered with the container's generated id, so a
+      // bare "dialog-title" points at nothing and the dialog is announced with
+      // no name at all. Only claim a label when there is a heading to name it.
+      labelledBy={props.title ? `${id}-dialog-title` : undefined}
       maxWidth={getDialogSize(props.size)}
       onCloseRequest={onClose}
       closeOnClickOutside={props.closeOnClickOutside}

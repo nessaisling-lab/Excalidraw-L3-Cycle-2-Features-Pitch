@@ -15,7 +15,8 @@ export const Modal: React.FC<{
   children: React.ReactNode;
   maxWidth?: number;
   onCloseRequest(): void;
-  labelledBy: string;
+  /** Omitted when the modal has no heading to point at. */
+  labelledBy?: string;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
 }> = (props) => {
