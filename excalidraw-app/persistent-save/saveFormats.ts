@@ -58,9 +58,20 @@ export const saveInFormat = async (
 
   // Same settings the export dialog would use: the user's background and
   // dark-mode choices come through appState.
+  //
+  // Except one. "Embed scene" writes the whole drawing into the PNG or SVG, and
+  // it is a per-browser setting that sticks once someone turns it on in the
+  // Export image dialog. Both exporters honour it, so inheriting it would hand
+  // that person a file these cards call flat and shareable while it quietly
+  // carries the editable scene. Measured with it on: a PNG went from 7,057 to
+  // 9,699 bytes and an SVG from 1,092 to 2,197, each with the scene inside.
+  //
+  // Provisional, pending Carlos (2026-09-23): the alternative is to inherit the
+  // setting and rewrite the cards, which needs his call and Lawrence's copy.
+  // Keeping the approved copy true needs neither. One line to reverse.
   const source = {
     elements: api.getSceneElements(),
-    appState: api.getAppState(),
+    appState: { ...api.getAppState(), exportEmbedScene: false },
     files: api.getFiles(),
   };
 
