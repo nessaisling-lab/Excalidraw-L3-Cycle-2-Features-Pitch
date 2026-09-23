@@ -1,0 +1,320 @@
+[
+  {
+    "theme": "light",
+    "checks": {
+      "emptyCanvas": {
+        "excalidraw": {
+          "role": "button",
+          "name": "Save as Excalidraw",
+          "ignored": false,
+          "disabled": false
+        },
+        "png": {
+          "role": "button",
+          "name": "Save as PNG",
+          "ignored": false,
+          "disabled": true
+        },
+        "svg": {
+          "role": "button",
+          "name": "Save as SVG",
+          "ignored": false,
+          "disabled": true
+        },
+        "reasonShown": true
+      },
+      "cardAnnouncement": {
+        "text": "Save your drawing. Download a copy to your device so you can keep working with it later. Save to file, or dismiss.",
+        "liveRegionCount": 1
+      },
+      "dialog": {
+        "role": "dialog",
+        "name": "",
+        "ignored": false,
+        "disabled": false
+      },
+      "group": {
+        "role": "group",
+        "name": "File format",
+        "ignored": false,
+        "disabled": false
+      },
+      "buttons": {
+        "excalidraw": {
+          "role": "button",
+          "name": "Save as Excalidraw",
+          "ignored": false,
+          "disabled": false
+        },
+        "png": {
+          "role": "button",
+          "name": "Save as PNG",
+          "ignored": false,
+          "disabled": false
+        },
+        "svg": {
+          "role": "button",
+          "name": "Save as SVG",
+          "ignored": false,
+          "disabled": false
+        }
+      },
+      "openedFromButton": {
+        "opener": "Save to file",
+        "focusLandsOn": {
+          "tag": "button",
+          "label": "Save as Excalidraw",
+          "cls": "ToolIcon_type_button ToolIcon_size_medium Card-button ToolIc",
+          "inDialog": true
+        }
+      },
+      "badge": {
+        "total": 3,
+        "hiddenFromAT": 2,
+        "exposedText": ["Recommended"],
+        "insideAnyControl": false
+      },
+      "tabOrder": [
+        {
+          "label": "Save as Excalidraw",
+          "inDialog": true
+        },
+        {
+          "label": "Save as PNG",
+          "inDialog": true
+        },
+        {
+          "label": "Save as SVG",
+          "inDialog": true
+        },
+        {
+          "label": "Save as Excalidraw",
+          "inDialog": true
+        },
+        {
+          "label": "Save as PNG",
+          "inDialog": true
+        },
+        {
+          "label": "Save as SVG",
+          "inDialog": true
+        }
+      ],
+      "focusEscapedDialog": false,
+      "contrast": {
+        "excalidraw": {
+          "fg": "rgb(18, 18, 18)",
+          "bg": "rgb(116, 184, 22)",
+          "ratio": 7.68
+        },
+        "png": {
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(105, 101, 219)",
+          "ratio": 4.68
+        },
+        "svg": {
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(214, 51, 108)",
+          "ratio": 4.62
+        },
+        "badge": {
+          "fg": "rgb(30, 92, 40)",
+          "bg": "rgb(235, 251, 238)",
+          "ratio": 7.48
+        }
+      },
+      "axe": {
+        "violations": [],
+        "passes": 13,
+        "incomplete": ["aria-valid-attr-value"]
+      },
+      "escape": {
+        "returnsFocusTo": {
+          "tag": "button",
+          "label": "Save to file",
+          "cls": "excalidraw-button persistent-save-button",
+          "inDialog": false
+        }
+      },
+      "openedFromCard": {
+        "focusLandsOn": {
+          "tag": "button",
+          "label": "Save as Excalidraw",
+          "cls": "ToolIcon_type_button ToolIcon_size_medium Card-button ToolIc",
+          "inDialog": true
+        }
+      },
+      "afterSave": {
+        "downloaded": "Untitled-2026-09-23-0120.excalidraw",
+        "dialogClosed": true,
+        "cardCleared": true,
+        "focusReturnsTo": {
+          "tag": "body",
+          "label": "You need to enable JavaScript to run thi",
+          "cls": "",
+          "inDialog": false
+        }
+      }
+    },
+    "pageErrors": "none"
+  },
+  {
+    "theme": "dark",
+    "checks": {
+      "emptyCanvas": {
+        "excalidraw": {
+          "role": "button",
+          "name": "Save as Excalidraw",
+          "ignored": false,
+          "disabled": false
+        },
+        "png": {
+          "role": "button",
+          "name": "Save as PNG",
+          "ignored": false,
+          "disabled": true
+        },
+        "svg": {
+          "role": "button",
+          "name": "Save as SVG",
+          "ignored": false,
+          "disabled": true
+        },
+        "reasonShown": true
+      },
+      "cardAnnouncement": {
+        "text": "Save your drawing. Download a copy to your device so you can keep working with it later. Save to file, or dismiss.",
+        "liveRegionCount": 1
+      },
+      "dialog": {
+        "role": "dialog",
+        "name": "",
+        "ignored": false,
+        "disabled": false
+      },
+      "group": {
+        "role": "group",
+        "name": "File format",
+        "ignored": false,
+        "disabled": false
+      },
+      "buttons": {
+        "excalidraw": {
+          "role": "button",
+          "name": "Save as Excalidraw",
+          "ignored": false,
+          "disabled": false
+        },
+        "png": {
+          "role": "button",
+          "name": "Save as PNG",
+          "ignored": false,
+          "disabled": false
+        },
+        "svg": {
+          "role": "button",
+          "name": "Save as SVG",
+          "ignored": false,
+          "disabled": false
+        }
+      },
+      "openedFromButton": {
+        "opener": "Save to file",
+        "focusLandsOn": {
+          "tag": "button",
+          "label": "Save as Excalidraw",
+          "cls": "ToolIcon_type_button ToolIcon_size_medium Card-button ToolIc",
+          "inDialog": true
+        }
+      },
+      "badge": {
+        "total": 3,
+        "hiddenFromAT": 2,
+        "exposedText": ["Recommended"],
+        "insideAnyControl": false
+      },
+      "tabOrder": [
+        {
+          "label": "Save as Excalidraw",
+          "inDialog": true
+        },
+        {
+          "label": "Save as PNG",
+          "inDialog": true
+        },
+        {
+          "label": "Save as SVG",
+          "inDialog": true
+        },
+        {
+          "label": "Save as Excalidraw",
+          "inDialog": true
+        },
+        {
+          "label": "Save as PNG",
+          "inDialog": true
+        },
+        {
+          "label": "Save as SVG",
+          "inDialog": true
+        }
+      ],
+      "focusEscapedDialog": false,
+      "contrast": {
+        "excalidraw": {
+          "fg": "rgb(18, 18, 18)",
+          "bg": "rgb(116, 184, 22)",
+          "ratio": 7.68
+        },
+        "png": {
+          "fg": "rgb(18, 18, 18)",
+          "bg": "rgb(168, 165, 255)",
+          "ratio": 8.47
+        },
+        "svg": {
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(214, 51, 108)",
+          "ratio": 4.62
+        },
+        "badge": {
+          "fg": "rgb(30, 92, 40)",
+          "bg": "rgb(235, 251, 238)",
+          "ratio": 7.48
+        }
+      },
+      "axe": {
+        "violations": [],
+        "passes": 13,
+        "incomplete": ["aria-valid-attr-value"]
+      },
+      "escape": {
+        "returnsFocusTo": {
+          "tag": "button",
+          "label": "Save to file",
+          "cls": "excalidraw-button persistent-save-button",
+          "inDialog": false
+        }
+      },
+      "openedFromCard": {
+        "focusLandsOn": {
+          "tag": "button",
+          "label": "Save as Excalidraw",
+          "cls": "ToolIcon_type_button ToolIcon_size_medium Card-button ToolIc",
+          "inDialog": true
+        }
+      },
+      "afterSave": {
+        "downloaded": "Untitled-2026-09-23-0120.excalidraw",
+        "dialogClosed": true,
+        "cardCleared": true,
+        "focusReturnsTo": {
+          "tag": "body",
+          "label": "You need to enable JavaScript to run thi",
+          "cls": "",
+          "inDialog": false
+        }
+      }
+    },
+    "pageErrors": "none"
+  }
+]
