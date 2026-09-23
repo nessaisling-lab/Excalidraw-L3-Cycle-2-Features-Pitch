@@ -1,5 +1,6 @@
 import { Card } from "@excalidraw/excalidraw/components/Card";
 import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
+import clsx from "clsx";
 import { IconButton } from "@excalidraw/excalidraw/components/IconButton";
 import {
   exportToFileIcon,
@@ -18,10 +19,11 @@ import "./SaveFormatDialog.scss";
 
 import type { SaveFormat } from "./saveFormats";
 
-/** Draft copy, pending Lawrence (copy owner). */
+/** Copy approved by Lawrence 2026-09-22. */
 export const SAVE_DIALOG_COPY = {
   title: "Save to file",
   group: "File format",
+  recommended: "Recommended",
   needsContent: "Draw something first.",
   failed: "Couldn't save the file. Please try again.",
 } as const;
@@ -80,34 +82,49 @@ export const SaveFormatOptions = ({
         role="group"
         aria-label={SAVE_DIALOG_COPY.group}
       >
-        {SAVE_FORMATS.map(({ format, label, description, needsContent }) => {
-          const { color, icon, button } = CARD_STYLE[format];
-          const blocked = needsContent && !hasContent;
-          return (
-            // Styling hook only; `display: contents` keeps the card in the grid.
-            <div
-              key={format}
-              className={`c1-save-formats__card c1-save-formats__card--${color}`}
-            >
-              <Card color={color}>
-                <div className="Card-icon">{icon}</div>
-                <h2>{label}</h2>
-                <div className="Card-details">
-                  {blocked ? SAVE_DIALOG_COPY.needsContent : description}
-                </div>
-                <IconButton
-                  className="Card-button"
-                  type="button"
-                  title={button}
-                  aria-label={button}
-                  showAriaLabel={true}
-                  disabled={busy || blocked}
-                  onClick={() => onChoose(format)}
-                />
-              </Card>
-            </div>
-          );
-        })}
+        {SAVE_FORMATS.map(
+          ({ format, label, description, needsContent, recommended }) => {
+            const { color, icon, button } = CARD_STYLE[format];
+            const blocked = needsContent && !hasContent;
+            return (
+              // Styling hook only; `display: contents` keeps the card in the grid.
+              <div
+                key={format}
+                className={`c1-save-formats__card c1-save-formats__card--${color}`}
+              >
+                <Card color={color}>
+                  {/*
+                    The badge sits above the icon, and the other cards carry a
+                    hidden twin, so one label can't push its column out of line
+                    with the rest.
+                  */}
+                  <span
+                    className={clsx("c1-save-formats__badge", {
+                      "c1-save-formats__badge--placeholder": !recommended,
+                    })}
+                    aria-hidden={!recommended}
+                  >
+                    {SAVE_DIALOG_COPY.recommended}
+                  </span>
+                  <div className="Card-icon">{icon}</div>
+                  <h2>{label}</h2>
+                  <div className="Card-details">
+                    {blocked ? SAVE_DIALOG_COPY.needsContent : description}
+                  </div>
+                  <IconButton
+                    className="Card-button"
+                    type="button"
+                    title={button}
+                    aria-label={button}
+                    showAriaLabel={true}
+                    disabled={busy || blocked}
+                    onClick={() => onChoose(format)}
+                  />
+                </Card>
+              </div>
+            );
+          },
+        )}
       </div>
     </div>
   );
