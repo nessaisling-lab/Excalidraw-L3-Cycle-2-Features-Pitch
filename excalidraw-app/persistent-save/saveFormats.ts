@@ -12,7 +12,9 @@ export type SaveFormat = "excalidraw" | "png" | "svg";
  * persistent button — agreed with Carlos on 2026-09-21: the same three the
  * export menu already covers, surfaced where people are looking for them.
  *
- * Draft copy, pending Lawrence (copy owner).
+ * Copy approved by Lawrence 2026-09-22. It states the one distinction the card
+ * promises and only this format keeps: the Excalidraw file stays editable,
+ * the images are flat. "Recommended" is the badge, so it isn't repeated here.
  */
 export const SAVE_FORMATS: readonly {
   format: SaveFormat;
@@ -20,23 +22,26 @@ export const SAVE_FORMATS: readonly {
   description: string;
   /** Image formats of an empty canvas are a blank file, so they wait for content. */
   needsContent: boolean;
+  /** Marked as the one that keeps the drawing editable. Exactly one. */
+  recommended?: boolean;
 }[] = [
   {
     format: "excalidraw",
     label: "Excalidraw file",
-    description: "Open it again later and keep editing",
+    description: "Keeps your shapes editable.",
     needsContent: false,
+    recommended: true,
   },
   {
     format: "png",
     label: "PNG image",
-    description: "A picture to share or paste anywhere",
+    description: "A flat image for sharing.",
     needsContent: true,
   },
   {
     format: "svg",
     label: "SVG image",
-    description: "Sharp at any size, for the web or print",
+    description: "A flat image that stays sharp at any size.",
     needsContent: true,
   },
 ];

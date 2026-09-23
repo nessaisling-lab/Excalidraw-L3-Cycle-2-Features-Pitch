@@ -96,6 +96,41 @@ describe("SaveFormatOptions", () => {
     expect(screen.getAllByText(SAVE_DIALOG_COPY.needsContent)).toHaveLength(2);
   });
 
+  it("recommends the Excalidraw file, and says so only once", () => {
+    const { container } = render(
+      <SaveFormatOptions hasContent busy={false} onChoose={() => {}} />,
+    );
+
+    // One badge is read out; the others are spacers that keep the columns
+    // level, so they must stay out of the accessibility tree.
+    expect(
+      screen.getAllByText(SAVE_DIALOG_COPY.recommended, {
+        ignore: '[aria-hidden="true"]',
+      }),
+    ).toHaveLength(1);
+    expect(container.querySelectorAll(".c1-save-formats__badge")).toHaveLength(
+      3,
+    );
+    expect(
+      container.querySelectorAll(
+        '.c1-save-formats__badge--placeholder[aria-hidden="true"]',
+      ),
+    ).toHaveLength(2);
+    expect(
+      SAVE_FORMATS.filter((f) => f.recommended).map((f) => f.format),
+    ).toEqual(["excalidraw"]);
+  });
+
+  it("states what each format gives you", () => {
+    render(<SaveFormatOptions hasContent busy={false} onChoose={() => {}} />);
+
+    expect(screen.getByText("Keeps your shapes editable.")).toBeTruthy();
+    expect(screen.getByText("A flat image for sharing.")).toBeTruthy();
+    expect(
+      screen.getByText("A flat image that stays sharp at any size."),
+    ).toBeTruthy();
+  });
+
   it("puts keyboard focus on the first card, not the second", () => {
     render(
       <SaveFormatOptions

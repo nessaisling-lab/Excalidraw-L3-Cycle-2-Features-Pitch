@@ -28,4 +28,26 @@
     cursor: not-allowed;
     opacity: 0.5;
   }
+
+  // Above the icon, per Jill 2026-09-22: below it, the badge pushed its own
+  // column's icon, title and button out of line with the other two.
+  .c1-save-formats__badge {
+    display: inline-block;
+    margin-bottom: 0.625rem;
+    padding: 3px 11px;
+    border: 1px solid #b2f2bb;
+    border-radius: 999px;
+    background-color: #ebfbee;
+    // 7.3:1 on that background, and both are fixed, so it holds in dark mode.
+    color: #1e5c28;
+    font-family: var(--ui-font);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  // The same badge, kept for its height only, on the cards without one.
+  .c1-save-formats__badge--placeholder {
+    visibility: hidden;
+  }
 }
