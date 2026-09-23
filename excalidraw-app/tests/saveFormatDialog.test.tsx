@@ -174,6 +174,51 @@ describe("saveInFormat", () => {
     );
   });
 
+  it("keeps images flat even when the export dialog left Embed scene on", async () => {
+    // The setting persists per browser, and both exporters honour it, so
+    // without overriding it the cards would promise a flat image and hand back
+    // one with the whole editable scene inside.
+    const editor = {
+      ...api(),
+      getAppState: () => ({ exportBackground: true, exportEmbedScene: true }),
+    } as unknown as ExcalidrawImperativeAPI;
+
+    await saveInFormat(editor, "png");
+    expect(exportToBlob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        appState: expect.objectContaining({ exportEmbedScene: false }),
+      }),
+    );
+
+    await saveInFormat(editor, "svg");
+    expect(exportToSvg).toHaveBeenCalledWith(
+      expect.objectContaining({
+        appState: expect.objectContaining({ exportEmbedScene: false }),
+      }),
+    );
+  });
+
+  it("leaves the user's other export settings alone", async () => {
+    const editor = {
+      ...api(),
+      getAppState: () => ({
+        exportBackground: false,
+        exportWithDarkMode: true,
+      }),
+    } as unknown as ExcalidrawImperativeAPI;
+
+    await saveInFormat(editor, "png");
+
+    expect(exportToBlob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        appState: expect.objectContaining({
+          exportBackground: false,
+          exportWithDarkMode: true,
+        }),
+      }),
+    );
+  });
+
   it("exports an SVG as an SVG file", async () => {
     await saveInFormat(api(), "svg");
 
