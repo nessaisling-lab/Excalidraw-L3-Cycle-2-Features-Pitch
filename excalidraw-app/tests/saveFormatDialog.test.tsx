@@ -7,6 +7,7 @@ import { exportToBlob, exportToSvg } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 import { downloadBlob, downloadScene } from "../persistent-save/downloadScene";
+import { PERSISTENT_SAVE_BUTTON_CLASS } from "../persistent-save/PersistentSaveButton";
 import {
   SAVE_DIALOG_COPY,
   SaveFormatDialog,
@@ -201,6 +202,31 @@ describe("SaveFormatDialog", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     expect(onSaved).toHaveBeenCalledTimes(1);
     expect(downloadBlob).toHaveBeenCalledTimes(1);
+  });
+
+  it("hands focus to the persistent button when the opener has gone", async () => {
+    // Saving from the card clears the card, so the button that opened the
+    // dialog is detached by the time the save resolves. Without a fallback the
+    // browser drops focus on <body> and a keyboard user loses their place.
+    const cardButton = document.createElement("button");
+    document.body.append(cardButton);
+    cardButton.focus();
+
+    const persistent = document.createElement("button");
+    persistent.className = `excalidraw-button ${PERSISTENT_SAVE_BUTTON_CLASS}`;
+    document.body.append(persistent);
+
+    render(
+      <SaveFormatDialog
+        excalidrawAPI={api()}
+        onSaved={() => cardButton.remove()}
+        onClose={() => {}}
+      />,
+    );
+
+    fireEvent.click(option("Save as PNG"));
+
+    await waitFor(() => expect(document.activeElement).toBe(persistent));
   });
 
   it("does not count a failed save, keeps the dialog open, and says so", async () => {

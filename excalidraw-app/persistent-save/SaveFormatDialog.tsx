@@ -13,6 +13,7 @@ import "@excalidraw/excalidraw/components/ExportDialog.scss";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
+import { PERSISTENT_SAVE_BUTTON_CLASS } from "./PersistentSaveButton";
 import { SAVE_FORMATS, saveInFormat } from "./saveFormats";
 
 import "./SaveFormatDialog.scss";
@@ -131,6 +132,23 @@ export const SaveFormatOptions = ({
 };
 
 /**
+ * Hands focus back after a save. Saving from the card clears the card, so the
+ * button that opened the dialog is gone by the time we get here — without a
+ * fallback the browser drops focus on <body> and a keyboard user is returned
+ * to the top of the document. The persistent button is the nearest equivalent
+ * of what they were using, and it is always present in the nudge arm.
+ */
+const returnFocus = (opener: HTMLElement | null) => {
+  if (opener?.isConnected) {
+    opener.focus();
+    return;
+  }
+  document
+    .querySelector<HTMLElement>(`.${PERSISTENT_SAVE_BUTTON_CLASS}`)
+    ?.focus();
+};
+
+/**
  * What "Save to file" opens, from either surface. Downloads straight to the
  * device in the chosen format — no OS Save dialog.
  */
@@ -155,10 +173,7 @@ export const SaveFormatDialog = ({
       await saveInFormat(excalidrawAPI, format);
       onSaved?.();
       onClose();
-      // The card's own button is gone once it clears; nothing to return to.
-      if (opener.current?.isConnected) {
-        opener.current.focus();
-      }
+      returnFocus(opener.current);
     } catch (error) {
       console.error(error);
       excalidrawAPI.setToast({
