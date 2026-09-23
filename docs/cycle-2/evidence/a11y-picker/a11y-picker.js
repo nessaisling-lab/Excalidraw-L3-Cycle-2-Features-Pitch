@@ -114,7 +114,7 @@ const run = async (browser, theme) => {
   await p.click(".persistent-save-button");
   await p.waitForSelector(".c1-save-formats", { timeout: 6000 });
   R.checks.emptyCanvas = {
-    excalidraw: await axNode(cdp, p, '[aria-label="Save as Excalidraw"]'),
+    excalidraw: await axNode(cdp, p, '[aria-label^="Save as Excalidraw"]'),
     png: await axNode(cdp, p, '[aria-label="Save as PNG"]'),
     svg: await axNode(cdp, p, '[aria-label="Save as SVG"]'),
     reasonShown: await p
@@ -156,7 +156,7 @@ const run = async (browser, theme) => {
   R.checks.dialog = await axNode(cdp, p, ".c1-save-format-dialog");
   R.checks.group = await axNode(cdp, p, ".c1-save-formats");
   R.checks.buttons = {
-    excalidraw: await axNode(cdp, p, '[aria-label="Save as Excalidraw"]'),
+    excalidraw: await axNode(cdp, p, '[aria-label^="Save as Excalidraw"]'),
     png: await axNode(cdp, p, '[aria-label="Save as PNG"]'),
     svg: await axNode(cdp, p, '[aria-label="Save as SVG"]'),
   };
@@ -197,7 +197,7 @@ const run = async (browser, theme) => {
   R.checks.contrast = await p.evaluate(() => {
     const rows = {};
     for (const [key, sel] of [
-      ["excalidraw", '[aria-label="Save as Excalidraw"]'],
+      ["excalidraw", '[aria-label^="Save as Excalidraw"]'],
       ["png", '[aria-label="Save as PNG"]'],
       ["svg", '[aria-label="Save as SVG"]'],
     ]) {
@@ -223,7 +223,7 @@ const run = async (browser, theme) => {
   }
 
   // ---- 6. focus ring, captured rather than computed -----------------------
-  await p.locator('[aria-label="Save as Excalidraw"]').focus();
+  await p.locator('[aria-label^="Save as Excalidraw"]').focus();
   await p.waitForTimeout(150);
   const island = await p.$(".c1-save-format-dialog .Island");
   const box = await island.boundingBox();

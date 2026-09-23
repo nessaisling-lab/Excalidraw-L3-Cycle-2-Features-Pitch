@@ -5,7 +5,7 @@
       "emptyCanvas": {
         "excalidraw": {
           "role": "button",
-          "name": "Save as Excalidraw",
+          "name": "Save as Excalidraw, recommended",
           "ignored": false,
           "disabled": false
         },
@@ -42,7 +42,7 @@
       "buttons": {
         "excalidraw": {
           "role": "button",
-          "name": "Save as Excalidraw",
+          "name": "Save as Excalidraw, recommended",
           "ignored": false,
           "disabled": false
         },
@@ -63,7 +63,7 @@
         "opener": "Save to file",
         "focusLandsOn": {
           "tag": "button",
-          "label": "Save as Excalidraw",
+          "label": "Save as Excalidraw, recommended",
           "cls": "ToolIcon_type_button ToolIcon_size_medium Card-button ToolIc",
           "inDialog": true
         }
@@ -76,7 +76,7 @@
       },
       "tabOrder": [
         {
-          "label": "Save as Excalidraw",
+          "label": "Save as Excalidraw, recommended",
           "inDialog": true
         },
         {
@@ -88,7 +88,7 @@
           "inDialog": true
         },
         {
-          "label": "Save as Excalidraw",
+          "label": "Save as Excalidraw, recommended",
           "inDialog": true
         },
         {
@@ -109,13 +109,13 @@
         },
         "png": {
           "fg": "rgb(255, 255, 255)",
-          "bg": "rgb(105, 101, 219)",
-          "ratio": 4.68
+          "bg": "rgb(214, 51, 108)",
+          "ratio": 4.62
         },
         "svg": {
           "fg": "rgb(255, 255, 255)",
-          "bg": "rgb(214, 51, 108)",
-          "ratio": 4.62
+          "bg": "rgb(105, 101, 219)",
+          "ratio": 4.68
         },
         "badge": {
           "fg": "rgb(30, 92, 40)",
@@ -139,19 +139,19 @@
       "openedFromCard": {
         "focusLandsOn": {
           "tag": "button",
-          "label": "Save as Excalidraw",
+          "label": "Save as Excalidraw, recommended",
           "cls": "ToolIcon_type_button ToolIcon_size_medium Card-button ToolIc",
           "inDialog": true
         }
       },
       "afterSave": {
-        "downloaded": "Untitled-2026-09-23-0120.excalidraw",
+        "downloaded": "Untitled-2026-09-23-1644.excalidraw",
         "dialogClosed": true,
         "cardCleared": true,
         "focusReturnsTo": {
-          "tag": "body",
-          "label": "You need to enable JavaScript to run thi",
-          "cls": "",
+          "tag": "button",
+          "label": "Save to file",
+          "cls": "excalidraw-button persistent-save-button",
           "inDialog": false
         }
       }
@@ -164,7 +164,7 @@
       "emptyCanvas": {
         "excalidraw": {
           "role": "button",
-          "name": "Save as Excalidraw",
+          "name": "Save as Excalidraw, recommended",
           "ignored": false,
           "disabled": false
         },
@@ -201,7 +201,7 @@
       "buttons": {
         "excalidraw": {
           "role": "button",
-          "name": "Save as Excalidraw",
+          "name": "Save as Excalidraw, recommended",
           "ignored": false,
           "disabled": false
         },
@@ -222,7 +222,7 @@
         "opener": "Save to file",
         "focusLandsOn": {
           "tag": "button",
-          "label": "Save as Excalidraw",
+          "label": "Save as Excalidraw, recommended",
           "cls": "ToolIcon_type_button ToolIcon_size_medium Card-button ToolIc",
           "inDialog": true
         }
@@ -235,7 +235,7 @@
       },
       "tabOrder": [
         {
-          "label": "Save as Excalidraw",
+          "label": "Save as Excalidraw, recommended",
           "inDialog": true
         },
         {
@@ -247,7 +247,7 @@
           "inDialog": true
         },
         {
-          "label": "Save as Excalidraw",
+          "label": "Save as Excalidraw, recommended",
           "inDialog": true
         },
         {
@@ -267,14 +267,14 @@
           "ratio": 7.68
         },
         "png": {
-          "fg": "rgb(18, 18, 18)",
-          "bg": "rgb(168, 165, 255)",
-          "ratio": 8.47
-        },
-        "svg": {
           "fg": "rgb(255, 255, 255)",
           "bg": "rgb(214, 51, 108)",
           "ratio": 4.62
+        },
+        "svg": {
+          "fg": "rgb(18, 18, 18)",
+          "bg": "rgb(168, 165, 255)",
+          "ratio": 8.47
         },
         "badge": {
           "fg": "rgb(30, 92, 40)",
@@ -298,19 +298,19 @@
       "openedFromCard": {
         "focusLandsOn": {
           "tag": "button",
-          "label": "Save as Excalidraw",
+          "label": "Save as Excalidraw, recommended",
           "cls": "ToolIcon_type_button ToolIcon_size_medium Card-button ToolIc",
           "inDialog": true
         }
       },
       "afterSave": {
-        "downloaded": "Untitled-2026-09-23-0120.excalidraw",
+        "downloaded": "Untitled-2026-09-23-1644.excalidraw",
         "dialogClosed": true,
         "cardCleared": true,
         "focusReturnsTo": {
-          "tag": "body",
-          "label": "You need to enable JavaScript to run thi",
-          "cls": "",
+          "tag": "button",
+          "label": "Save to file",
+          "cls": "excalidraw-button persistent-save-button",
           "inDialog": false
         }
       }
