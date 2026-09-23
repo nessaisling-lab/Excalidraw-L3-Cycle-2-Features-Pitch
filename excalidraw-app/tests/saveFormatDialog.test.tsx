@@ -44,7 +44,10 @@ const api = (elements: unknown[] = [{ id: "rect" }]) =>
     setToast: vi.fn(),
   } as unknown as ExcalidrawImperativeAPI);
 
-const option = (name: string) => screen.getByRole("button", { name });
+// The recommended card's accessible name carries a ", recommended" tail, so
+// match on the start of the name rather than the whole of it.
+const option = (name: string) =>
+  screen.getByRole("button", { name: new RegExp(`^${name}`) });
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -59,7 +62,11 @@ describe("SaveFormatOptions", () => {
     ).toEqual(SAVE_FORMATS.map((f) => f.label));
     expect(
       screen.getAllByRole("button").map((b) => b.getAttribute("aria-label")),
-    ).toEqual(["Save as Excalidraw", "Save as PNG", "Save as SVG"]);
+    ).toEqual([
+      "Save as Excalidraw, recommended",
+      "Save as PNG",
+      "Save as SVG",
+    ]);
     for (const { description } of SAVE_FORMATS) {
       expect(screen.getByText(description)).toBeTruthy();
     }
@@ -120,6 +127,26 @@ describe("SaveFormatOptions", () => {
     expect(
       SAVE_FORMATS.filter((f) => f.recommended).map((f) => f.format),
     ).toEqual(["excalidraw"]);
+  });
+
+  it("names the recommendation for a screen reader without printing it on the button", () => {
+    // showAriaLabel renders the accessible name as the visible label, so
+    // setting aria-label alone would have changed the on-screen text too.
+    render(<SaveFormatOptions hasContent busy={false} onChoose={() => {}} />);
+
+    const excalidraw = option("Save as Excalidraw");
+
+    expect(excalidraw.getAttribute("aria-label")).toBe(
+      "Save as Excalidraw, recommended",
+    );
+    expect(excalidraw.textContent).toBe("Save as Excalidraw");
+    // WCAG 2.5.3: the accessible name has to contain the visible label.
+    expect(excalidraw.getAttribute("aria-label")).toContain(
+      excalidraw.textContent,
+    );
+    expect(option("Save as PNG").getAttribute("aria-label")).toBe(
+      "Save as PNG",
+    );
   });
 
   it("states what each format gives you", () => {
