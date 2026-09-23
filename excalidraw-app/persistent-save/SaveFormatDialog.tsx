@@ -33,6 +33,11 @@ export const SAVE_DIALOG_COPY = {
  * "Save to…" dialog so the two read as one family — Carlos, 2026-09-21: "keep
  * them the same and on-brand". The Excalidraw file takes that dialog's lime,
  * because it is the same action as its "Save to disk".
+ *
+ * The colours also run in that dialog's order — lime, pink, violet. They used
+ * to run lime, violet, pink, which was the one thing that still read as a
+ * different visual language when the two were opened side by side
+ * (Carlos, 2026-09-23).
  */
 const CARD_STYLE: Record<
   SaveFormat,
@@ -43,8 +48,8 @@ const CARD_STYLE: Record<
     icon: exportToFileIcon,
     button: "Save as Excalidraw",
   },
-  png: { color: "primary", icon: pngIcon, button: "Save as PNG" },
-  svg: { color: "pink", icon: svgIcon, button: "Save as SVG" },
+  png: { color: "pink", icon: pngIcon, button: "Save as PNG" },
+  svg: { color: "primary", icon: svgIcon, button: "Save as SVG" },
 };
 
 /**

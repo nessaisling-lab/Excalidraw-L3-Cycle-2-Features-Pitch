@@ -6,6 +6,14 @@
     display: contents;
   }
 
+  // The card is shrink-to-fit, so a short description leaves it narrower than
+  // its column: ours measured 207 / 180 / 207 where the house dialog's three
+  // are all 207, because every one of its descriptions is long enough to fill
+  // the width. Fill the column instead of the text (Carlos, 2026-09-23).
+  .c1-save-formats .Card {
+    width: 100%;
+  }
+
   // White on Excalidraw's lime (#74b816) is 2.44:1. --color-gray-100 is fixed
   // at #121212 in both themes, 7.7:1 on the lime.
   .c1-save-formats__card--lime
