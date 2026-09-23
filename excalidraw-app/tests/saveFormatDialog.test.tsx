@@ -7,6 +7,7 @@ import { exportToBlob, exportToSvg } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 import { downloadBlob, downloadScene } from "../persistent-save/downloadScene";
+import { PERSISTENT_SAVE_BUTTON_CLASS } from "../persistent-save/PersistentSaveButton";
 import {
   SAVE_DIALOG_COPY,
   SaveFormatDialog,
@@ -43,7 +44,10 @@ const api = (elements: unknown[] = [{ id: "rect" }]) =>
     setToast: vi.fn(),
   } as unknown as ExcalidrawImperativeAPI);
 
-const option = (name: string) => screen.getByRole("button", { name });
+// The recommended card's accessible name carries a ", recommended" tail, so
+// match on the start of the name rather than the whole of it.
+const option = (name: string) =>
+  screen.getByRole("button", { name: new RegExp(`^${name}`) });
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -58,7 +62,11 @@ describe("SaveFormatOptions", () => {
     ).toEqual(SAVE_FORMATS.map((f) => f.label));
     expect(
       screen.getAllByRole("button").map((b) => b.getAttribute("aria-label")),
-    ).toEqual(["Save as Excalidraw", "Save as PNG", "Save as SVG"]);
+    ).toEqual([
+      "Save as Excalidraw, recommended",
+      "Save as PNG",
+      "Save as SVG",
+    ]);
     for (const { description } of SAVE_FORMATS) {
       expect(screen.getByText(description)).toBeTruthy();
     }
@@ -119,6 +127,26 @@ describe("SaveFormatOptions", () => {
     expect(
       SAVE_FORMATS.filter((f) => f.recommended).map((f) => f.format),
     ).toEqual(["excalidraw"]);
+  });
+
+  it("names the recommendation for a screen reader without printing it on the button", () => {
+    // showAriaLabel renders the accessible name as the visible label, so
+    // setting aria-label alone would have changed the on-screen text too.
+    render(<SaveFormatOptions hasContent busy={false} onChoose={() => {}} />);
+
+    const excalidraw = option("Save as Excalidraw");
+
+    expect(excalidraw.getAttribute("aria-label")).toBe(
+      "Save as Excalidraw, recommended",
+    );
+    expect(excalidraw.textContent).toBe("Save as Excalidraw");
+    // WCAG 2.5.3: the accessible name has to contain the visible label.
+    expect(excalidraw.getAttribute("aria-label")).toContain(
+      excalidraw.textContent,
+    );
+    expect(option("Save as PNG").getAttribute("aria-label")).toBe(
+      "Save as PNG",
+    );
   });
 
   it("states what each format gives you", () => {
@@ -246,6 +274,31 @@ describe("SaveFormatDialog", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     expect(onSaved).toHaveBeenCalledTimes(1);
     expect(downloadBlob).toHaveBeenCalledTimes(1);
+  });
+
+  it("hands focus to the persistent button when the opener has gone", async () => {
+    // Saving from the card clears the card, so the button that opened the
+    // dialog is detached by the time the save resolves. Without a fallback the
+    // browser drops focus on <body> and a keyboard user loses their place.
+    const cardButton = document.createElement("button");
+    document.body.append(cardButton);
+    cardButton.focus();
+
+    const persistent = document.createElement("button");
+    persistent.className = `excalidraw-button ${PERSISTENT_SAVE_BUTTON_CLASS}`;
+    document.body.append(persistent);
+
+    render(
+      <SaveFormatDialog
+        excalidrawAPI={api()}
+        onSaved={() => cardButton.remove()}
+        onClose={() => {}}
+      />,
+    );
+
+    fireEvent.click(option("Save as PNG"));
+
+    await waitFor(() => expect(document.activeElement).toBe(persistent));
   });
 
   it("does not count a failed save, keeps the dialog open, and says so", async () => {

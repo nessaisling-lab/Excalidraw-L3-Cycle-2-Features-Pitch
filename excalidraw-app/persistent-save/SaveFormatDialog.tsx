@@ -13,6 +13,7 @@ import "@excalidraw/excalidraw/components/ExportDialog.scss";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
+import { PERSISTENT_SAVE_BUTTON_CLASS } from "./PersistentSaveButton";
 import { SAVE_FORMATS, saveInFormat } from "./saveFormats";
 
 import "./SaveFormatDialog.scss";
@@ -24,6 +25,8 @@ export const SAVE_DIALOG_COPY = {
   title: "Save to file",
   group: "File format",
   recommended: "Recommended",
+  /** Lower case, because it is read as the tail of the button's own name. */
+  recommendedSuffix: "recommended",
   needsContent: "Draw something first.",
   failed: "Couldn't save the file. Please try again.",
 } as const;
@@ -116,15 +119,30 @@ export const SaveFormatOptions = ({
                   <div className="Card-details">
                     {blocked ? SAVE_DIALOG_COPY.needsContent : description}
                   </div>
+                  {/*
+                    The recommendation reaches someone reading the dialog as
+                    text, but tabbing announced three options that sounded
+                    equivalent, so it is named here too (Lawrence, 2026-09-23).
+                    `showAriaLabel` renders the accessible name as the visible
+                    label, so the label is rendered separately instead — the
+                    button still reads "Save as Excalidraw" on screen, and the
+                    accessible name contains it, which keeps WCAG 2.5.3.
+                  */}
                   <IconButton
                     className="Card-button"
                     type="button"
                     title={button}
-                    aria-label={button}
-                    showAriaLabel={true}
+                    aria-label={
+                      recommended
+                        ? `${button}, ${SAVE_DIALOG_COPY.recommendedSuffix}`
+                        : button
+                    }
+                    showAriaLabel={false}
                     disabled={busy || blocked}
                     onClick={() => onChoose(format)}
-                  />
+                  >
+                    <div className="ToolIcon__label">{button}</div>
+                  </IconButton>
                 </Card>
               </div>
             );
@@ -133,6 +151,23 @@ export const SaveFormatOptions = ({
       </div>
     </div>
   );
+};
+
+/**
+ * Hands focus back after a save. Saving from the card clears the card, so the
+ * button that opened the dialog is gone by the time we get here — without a
+ * fallback the browser drops focus on <body> and a keyboard user is returned
+ * to the top of the document. The persistent button is the nearest equivalent
+ * of what they were using, and it is always present in the nudge arm.
+ */
+const returnFocus = (opener: HTMLElement | null) => {
+  if (opener?.isConnected) {
+    opener.focus();
+    return;
+  }
+  document
+    .querySelector<HTMLElement>(`.${PERSISTENT_SAVE_BUTTON_CLASS}`)
+    ?.focus();
 };
 
 /**
@@ -160,10 +195,7 @@ export const SaveFormatDialog = ({
       await saveInFormat(excalidrawAPI, format);
       onSaved?.();
       onClose();
-      // The card's own button is gone once it clears; nothing to return to.
-      if (opener.current?.isConnected) {
-        opener.current.focus();
-      }
+      returnFocus(opener.current);
     } catch (error) {
       console.error(error);
       excalidrawAPI.setToast({
