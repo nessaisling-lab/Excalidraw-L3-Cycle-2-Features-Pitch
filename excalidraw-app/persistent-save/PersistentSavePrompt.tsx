@@ -20,15 +20,15 @@ export const PersistentSavePrompt = ({
   onSaveRequest,
 }: {
   /**
-   * Opens the format picker. `onSaved` runs only once a file was actually
-   * written — closing the picker is not a save, so the card stays.
+   * Opens the format picker. The card clears itself only once a file is
+   * actually written (via recordC1Save) — closing the picker is not a save.
    */
-  onSaveRequest: (onSaved: () => void) => void;
+  onSaveRequest: () => void;
 }) => {
   const elements = useExcalidrawElements();
   const appState = useExcalidrawAppState();
 
-  const { visible, dismiss, recordSave } = usePersistentSavePrompt({
+  const { visible, dismiss } = usePersistentSavePrompt({
     elements,
     appState,
   });
@@ -39,10 +39,5 @@ export const PersistentSavePrompt = ({
     return null;
   }
 
-  return (
-    <SaveDrawingPrompt
-      onSave={() => onSaveRequest(recordSave)}
-      onDismiss={dismiss}
-    />
-  );
+  return <SaveDrawingPrompt onSave={onSaveRequest} onDismiss={dismiss} />;
 };

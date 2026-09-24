@@ -176,3 +176,19 @@ export const subscribeToC1Changes = (
   window.addEventListener("storage", handler);
   return () => window.removeEventListener("storage", handler);
 };
+
+/**
+ * Same-tab signal for a completed save. The `storage` subscription above only
+ * hears *other* tabs, so a save in this tab needs its own nudge.
+ */
+export const C1_SAVED_EVENT = "excalidraw-c1-saved";
+
+/**
+ * A completed save from any surface ends the prompt (PRD §5) — the card's own
+ * button or the persistent one. Recorded even when the card isn't mounted, so
+ * it can't turn up later for someone who has already saved.
+ */
+export const recordC1Save = (): void => {
+  markC1State("saved");
+  window.dispatchEvent(new Event(C1_SAVED_EVENT));
+};

@@ -12,6 +12,8 @@ import React from "react";
  */
 export const SAVE_BUTTON_LABEL = "Save to file";
 export const SAVE_BUTTON_TITLE = "Save to file (Ctrl/Cmd+S)";
+/** Exported so the save dialog can hand focus back here without guessing. */
+export const PERSISTENT_SAVE_BUTTON_CLASS = "persistent-save-button";
 
 export const PersistentSaveButton = ({
   isPlusSignedUser,
@@ -31,7 +33,7 @@ export const PersistentSaveButton = ({
   return (
     <button
       type="button"
-      className="excalidraw-button persistent-save-button"
+      className={`excalidraw-button ${PERSISTENT_SAVE_BUTTON_CLASS}`}
       title={SAVE_BUTTON_TITLE}
       aria-label={SAVE_BUTTON_LABEL}
       onClick={onSave}
